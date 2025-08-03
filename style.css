@@ -1,0 +1,11 @@
+.btn-success{
+    background: yellowgreen;
+    padding: 5px;
+    border-radius: 4px;
+}
+
+.btn-danger{
+    background: salmon;
+    padding: 5px;
+    border-radius: 4px;
+}
