@@ -1,18 +1,12 @@
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     const url = new URL(request.url);
-
-    // Serve HTML
-    if (url.pathname === "/") {
+    
+    // Let Cloudflare handle static assets automatically
+    if (['/index.html', '/', '/script.js', '/style.css'].includes(url.pathname)) {
       return env.ASSETS.fetch(request);
     }
-
-    // Serve JS/CSS (let Workers Sites handle it)
-    if (url.pathname === "/index.js" || url.pathname === "/style.css") {
-      return env.ASSETS.fetch(request);
-    }
-
-    // Fallback: 404
-    return new Response("Not Found", { status: 404 });
-  },
+    
+    return new Response("Not found", { status: 404 });
+  }
 };
