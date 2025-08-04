@@ -1,4 +1,4 @@
-import main from "main.html";
+import main from "./main.html";
 
 export default {
 	async fetch(request, env, ctx) {
@@ -7,8 +7,7 @@ export default {
 
 		if (url.pathname === "/api") {
 			// You could also call a third party API here
-			const data = await import("./data.js");
-			return Response.json(data);
+			console.log("Api call made")
 		}
 		return new Response(main, {
 			headers: {
