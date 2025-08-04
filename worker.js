@@ -7,7 +7,7 @@ export default {
       return env.ASSETS.fetch(request);
     } 
     if (url.pathname === '/') {
-      return env.ASSETS.fetch("main.html")
+      return env.ASSETS.fetch('https://assets.local/main.html')
     }
     
     return new Response("Not found", { status: 404 });
