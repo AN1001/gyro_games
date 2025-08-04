@@ -1,7 +1,7 @@
 // Import your main HTML file (as before)
 import main from "./main.html";
 import css from "./style.css";
-import js from "./script.js";
+import js from "./index.js";
 
 export default {
   async fetch(request, env, ctx) {
