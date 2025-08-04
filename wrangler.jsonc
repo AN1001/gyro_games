@@ -1,7 +1,7 @@
 {
   "name": "gyrogames",
   "main": "worker.js",
-  "compatibility_date": "2025-08-04"
+  "compatibility_date": "2025-08-04",
   "assets": {
     "bucket": "./",
     "include": ["*"]
