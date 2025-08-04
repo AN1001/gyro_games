@@ -1,18 +1,38 @@
+// Import your main HTML file (as before)
 import main from "./main.html";
+import css from "./style.css";
+import js from "./script.js";
 
 export default {
-	async fetch(request, env, ctx) {
-		const url = new URL(request.url);
-		console.log(`Hello ${navigator.userAgent} at path ${url.pathname}!`);
+  async fetch(request, env, ctx) {
+    const url = new URL(request.url);
+    console.log(`Request from ${request.headers.get("user-agent")} at ${url.pathname}`);
 
-		if (url.pathname === "/api") {
-			// You could also call a third party API here
-			console.log("Api call made")
-		}
-		return new Response(main, {
-			headers: {
-				"content-type": "text/html",
-			},
-		});
-	},
+    // Handle API calls (optional)
+    if (url.pathname === "/api") {
+      console.log("API call made");
+      return new Response(JSON.stringify({ message: "API response" }), {
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
+    // Serve CSS file
+    if (url.pathname === "/style.css") {
+      return new Response(css, {
+        headers: { "Content-Type": "text/css" },
+      });
+    }
+
+    // Serve JS file
+    if (url.pathname === "/index.js") {
+      return new Response(js, {
+        headers: { "Content-Type": "application/javascript" },
+      });
+    }
+
+    // Default: Serve main.html
+    return new Response(main, {
+      headers: { "Content-Type": "text/html" },
+    });
+  },
 };
