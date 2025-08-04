@@ -2,7 +2,10 @@ export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
     
-    // Let Cloudflare handle static assets automatically
+    if (url.pathname.startsWith("/api/")) {
+      // TODO: Add your custom /api/* logic here.
+      return new Response("Ok");
+    }
     if (['/main.html', '/index.js', '/style.css'].includes(url.pathname)) {
       return env.ASSETS.fetch(request);
     } 
