@@ -151,3 +151,34 @@ window.addEventListener('beforeunload', () => {
 });
 
 start_data_stream(10);
+
+const BODY = {
+  key1: "value1",
+  key2: "value2"
+};
+
+const url = "https://gyrogames.arnavium.workers.dev/api/";
+
+const options = {
+  method: "PUT",
+  headers: {
+    "Content-Type": "application/json", // Adjust content type if needed
+    // Add other headers like Authorization if required
+    // "Authorization": "Bearer YOUR_TOKEN"
+  },
+  body: JSON.stringify(BODY) // Convert the object to a JSON string
+};
+
+fetch(url, options)
+  .then(response => {
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return response.json(); // or response.text() if not JSON
+  })
+  .then(data => {
+    console.log("Success:", data);
+  })
+  .catch(error => {
+    console.error("Error:", error);
+  });
