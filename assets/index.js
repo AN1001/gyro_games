@@ -61,6 +61,7 @@ let createOffer = async () => {
 
     peerConnection.onicecandidate = async (event) => {
         if (event.candidate) {
+            console.log(JSON.stringify(peerConnection.localDescription));
             document.getElementById('offer-sdp').value = JSON.stringify(peerConnection.localDescription);
         }
     };
