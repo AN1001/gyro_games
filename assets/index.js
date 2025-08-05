@@ -178,7 +178,7 @@ async function store_offer(BODY) {
         body: JSON.stringify(BODY) // Convert the object to a JSON string
     };
 
-    fetch(url, options)
+    return fetch(url, options)
         .then(response => {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
