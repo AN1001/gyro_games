@@ -59,14 +59,9 @@ let createOffer = async () => {
     dataChannel = peerConnection.createDataChannel("dataChannel");
     setupDataChannelHandlers(dataChannel);
 
-    peerConnection.onicecandidate = async (event) => {
-        if (event.candidate) {
-            document.getElementById('offer-sdp').value = JSON.stringify(peerConnection.localDescription);
-        }
-    };
-
     const offer = await peerConnection.createOffer();
     await peerConnection.setLocalDescription(offer);
+    document.getElementById('offer-sdp').value = JSON.stringify(peerConnection.localDescription);
     console.log(offer);
 }
 
@@ -75,15 +70,11 @@ let generateOffer = async () => {
     dataChannel = peerConnection.createDataChannel("dataChannel");
     setupDataChannelHandlers(dataChannel);
 
-    peerConnection.onicecandidate = async (event) => {
-        if (event.candidate) {
-            const DATA = { "SDP_OFFER": peerConnection.localDescription }
-            store_offer(DATA);
-        }
-    };
-
     const offer = await peerConnection.createOffer();
+    console.log(offer);
     await peerConnection.setLocalDescription(offer);
+    const DATA = { "SDP_OFFER": peerConnection.localDescription }
+    store_offer(DATA);
 }
 
 let createAnswer = async () => {
