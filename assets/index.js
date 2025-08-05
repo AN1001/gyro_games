@@ -74,7 +74,9 @@ let generateOffer = async () => {
     console.log(offer);
     await peerConnection.setLocalDescription(offer);
     const DATA = { "SDP_OFFER": peerConnection.localDescription }
-    store_offer(DATA);
+    let generated_code = store_offer(DATA);
+    document.getElementById("generated_code").textContent = generated_code;
+
 }
 
 let createAnswer = async () => {
@@ -185,6 +187,7 @@ async function store_offer(BODY) {
         })
         .then(data => {
             console.log("Success:", data);
+            return data;
         })
         .catch(error => {
             console.error("Error:", error);
