@@ -1,0 +1,15 @@
+{
+  "name": "gyrogames",
+  "main": "worker.js",
+  "compatibility_date": "2025-08-04",
+  "assets": {
+    "directory": "./assets",
+    "binding": "ASSETS"
+  },
+  "kv_namespaces": [
+    {
+      "binding": "WEB_RTC_CACHE",
+      "id": "a28a98b5c3774fef871ed1bee1517213"
+    }
+  ]
+}

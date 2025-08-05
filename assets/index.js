@@ -144,6 +144,9 @@ init();
 document.getElementById('create-offer').addEventListener('click', createOffer);
 document.getElementById('create-answer').addEventListener('click', createAnswer);
 document.getElementById('add-answer').addEventListener('click', addAnswer);
+document.getElementById('request_access').addEventListener('click', function(){
+    DeviceMotionEvent.requestPermission();
+});
 
 window.addEventListener('beforeunload', () => {
   if (dataChannel) dataChannel.close();
