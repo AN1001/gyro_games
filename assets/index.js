@@ -239,7 +239,7 @@ async function get_offer(CODE) {
         })
         .then(data => {
             console.log("Success");
-			      return data["SDP_OFFER"];
+			return data["SDP_OFFER"];
         })
         .catch(error => {
             console.error("Error:", error);
@@ -250,7 +250,7 @@ async function get_offer(CODE) {
 async function store_answer(code, offer, answer){
     const url = "https://gyrogames.arnavium.workers.dev/api/";
     const BODY = {
-        "SPD_OFFER":JSON.stringify(offer),
+        "SDP_OFFER":JSON.stringify(offer),
         "SDP_ANSWER":JSON.stringify(answer)
     }
     const options = {
