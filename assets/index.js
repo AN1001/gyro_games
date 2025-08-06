@@ -309,6 +309,62 @@ async function get_answer(CODE) {
         }
     };
 
+    try {
+        const response = await fetch(url, options);
+        
+        // First check HTTP status
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`HTTP ${response.status}: ${errorText}`);
+        }
+
+        // Get raw text first for debugging
+        const responseText = await response.text();
+        console.log("Raw API response:", responseText);
+
+        // Parse once
+        const data = JSON.parse(responseText);
+        
+        // Handle SDP_ANSWER
+        const sdpAnswer = data.SDP_ANSWER;
+        
+        if (!sdpAnswer) {
+            throw new Error("Missing SDP_ANSWER in response");
+        }
+
+        // Case 1: Already parsed object
+        if (typeof sdpAnswer !== 'string') {
+            return sdpAnswer;
+        }
+
+        // Case 2: String that needs parsing
+        try {
+            return JSON.parse(sdpAnswer);
+        } catch (parseError) {
+            console.warn("SDP_ANSWER wasn't valid JSON, returning raw:", sdpAnswer);
+            return sdpAnswer;
+        }
+
+    } catch (error) {
+        console.error("get_answer failed:", error);
+        return { 
+            error: true,
+            message: error.message,
+            rawError: error // Preserve original error
+        };
+    }
+}
+
+async function get_answer_old(CODE) {
+    const url = "https://gyrogames.arnavium.workers.dev/api/";
+    const options = {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            "SDP_CODE": CODE,
+        }
+    };
+
     return fetch(url, options)
     .then(response => {
         if (!response.ok) {
