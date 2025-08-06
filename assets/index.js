@@ -122,7 +122,7 @@ let addAnswer = async () => {
 let SDP_link_start = async () => {
     console.log('Link Started');
     
-    let CODE = document.getElementById('enter-code').value;
+    let CODE = document.getElementById('generated-code').textContent;
     let answer = await get_answer(CODE);
 
     if (!peerConnection.currentRemoteDescription) {
