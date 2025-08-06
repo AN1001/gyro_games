@@ -93,14 +93,17 @@ let createAnswer = async () => {
     let answer = await peerConnection.createAnswer();
     await peerConnection.setLocalDescription(answer);
 }
+
 let generateAnswer = async () => {
     code = document.getElementById('enter-code').value;
+    //TODO error handle
     offer = await get_offer(code);
 
     await peerConnection.setRemoteDescription(offer);
     let answer = await peerConnection.createAnswer();
     await peerConnection.setLocalDescription(answer);
-    store_answer(offer, answer);
+    let state = await store_answer(code, offer, answer);
+    console.log(state);
 }
 
 let addAnswer = async () => {
@@ -231,6 +234,34 @@ async function get_offer(CODE) {
         });
 }
 
-async function store_answer(offer, answer){
-    console.log(`Answer: ${answer}`);
+async function store_answer(code, offer, answer){
+    const url = "https://gyrogames.arnavium.workers.dev/api/";
+    const BODY = {
+        "SPD_OFFER":JSON.stringify(offer),
+        "SDP_ANSWER":JSON.stringify(answer)
+    }
+    const options = {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+            "SDP_CODE":code,
+        },
+        body: JSON.stringify(BODY) // Convert the object to a JSON string
+    };
+
+    return fetch(url, options)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.text(); // or response.text() if not JSON
+        })
+        .then(data => {
+            console.log("Success:", data);
+            return data;
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            return "Error";
+        });
 }
