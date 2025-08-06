@@ -64,6 +64,11 @@ let createOffer = async () => {
     await peerConnection.setLocalDescription(offer);
     document.getElementById('offer-sdp').value = JSON.stringify(peerConnection.localDescription);
     console.log(offer);
+
+    const DATA = { "SDP_OFFER": peerConnection.localDescription }
+    console.log(`Offer: ${JSON.stringify(peerConnection.localDescription)}`);
+    let generated_code = await store_offer(DATA);
+    document.getElementById("generated_code").textContent = generated_code;
 }
 
 let generateOffer = async () => {
@@ -81,6 +86,9 @@ let generateOffer = async () => {
 
 let createAnswer = async () => {
     let offer = JSON.parse(document.getElementById('offer-sdp').value);
+    code = document.getElementById('enter-code').value;
+    let offer2 = await get_offer(code);
+    console.log(offer==offer2)
 
     peerConnection.onicecandidate = async (event) => {
         if (event.candidate) {
@@ -94,6 +102,12 @@ let createAnswer = async () => {
     let answer = await peerConnection.createAnswer();
     await peerConnection.setLocalDescription(answer);
     document.getElementById('answer-sdp').value = JSON.stringify(peerConnection.localDescription);
+    let state = await store_answer(code, offer, answer);
+    if (state == "Ok") {
+        console.log(`Answer: ${JSON.stringify(answer)}`)
+    } else {
+        document.getElementById('generated_code').textContent = "Invalid Code";
+    }
 }
 
 let generateAnswer = async () => {
@@ -115,6 +129,10 @@ let generateAnswer = async () => {
 let addAnswer = async () => {
     console.log('Add answer triggered');
     let answer = JSON.parse(document.getElementById('answer-sdp').value);
+    let CODE = document.getElementById('generated_code').textContent;
+    let answer2 = await get_answer(CODE);
+    console.log(answer==answer2)
+
     console.log('answer:', answer);
     if (!peerConnection.currentRemoteDescription) {
         peerConnection.setRemoteDescription(answer);
