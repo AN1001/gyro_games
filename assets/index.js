@@ -310,20 +310,30 @@ async function get_answer(CODE) {
     };
 
     return fetch(url, options)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log("Success");
+        // Check if SDP_ANSWER is a string that needs parsing
+        if (typeof data["SDP_ANSWER"] === 'string') {
+            try {
+                return JSON.parse(data["SDP_ANSWER"]);
+            } catch (e) {
+                console.warn("SDP_ANSWER wasn't valid JSON:", data["SDP_ANSWER"]);
+                return data["SDP_ANSWER"]; // return as-is if not JSON
             }
-            return response.json(); // or response.text() if not JSON
-        })
-        .then(data => {
-            console.log("Success");
-            return JSON.parse(data["SDP_ANSWER"]);
-        })
-        .catch(error => {
-            console.error("Error:", error);
-            return "Error";
-        });
+        }
+        // If it's already an object, return directly
+        return data["SDP_ANSWER"];
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        return { error: error.message }; // Better to return error object
+    });
 }
 
 function on_receive_data(data) {
