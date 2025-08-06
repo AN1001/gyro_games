@@ -92,6 +92,7 @@ let createAnswer = async () => {
 
     let answer = await peerConnection.createAnswer();
     await peerConnection.setLocalDescription(answer);
+    document.getElementById('answer-sdp').value = JSON.stringify(peerConnection.localDescription);
 }
 
 let generateAnswer = async () => {
