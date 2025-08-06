@@ -88,7 +88,7 @@ let createAnswer = async () => {
     let offer = JSON.parse(document.getElementById('offer-sdp').value);
     code = document.getElementById('enter-code').value;
     let offer2 = await get_offer(code);
-    console.log(offer==offer2)
+    console.log(JSON.stringify(offer)==JSON.stringify(offer2))
 
     peerConnection.onicecandidate = async (event) => {
         if (event.candidate) {
@@ -131,7 +131,7 @@ let addAnswer = async () => {
     let answer = JSON.parse(document.getElementById('answer-sdp').value);
     let CODE = document.getElementById('generated_code').textContent;
     let answer2 = await get_answer(CODE);
-    console.log(answer==answer2)
+    console.log(JSON.stringify(answer)==JSON.stringify(answer2))
 
     console.log('answer:', answer);
     if (!peerConnection.currentRemoteDescription) {
