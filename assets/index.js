@@ -103,7 +103,11 @@ let generateAnswer = async () => {
     let answer = await peerConnection.createAnswer();
     await peerConnection.setLocalDescription(answer);
     let state = await store_answer(code, offer, answer);
-    console.log(state);
+    if(state=="Ok"){
+        console.log("Ok")
+    } else {
+        document.getElementById('generated_code').textContent = "Invalid Code";
+    }
 }
 
 let addAnswer = async () => {
@@ -115,6 +119,16 @@ let addAnswer = async () => {
     }
 }
 
+let SDP_link_start = async () => {
+    console.log('Link Started');
+    
+    let CODE = document.getElementById('enter-code').value;
+    let answer = await get_answer(CODE);
+
+    if (!peerConnection.currentRemoteDescription) {
+        peerConnection.setRemoteDescription(answer);
+    }
+}
 // Helper function to set up data channel event handlers
 function setupDataChannelHandlers(channel) {
     channel.onopen = () => {
@@ -176,6 +190,7 @@ start_data_stream(10);
 
 document.getElementById('gen_code').addEventListener('click', generateOffer);
 document.getElementById('add_code').addEventListener('click', generateAnswer);
+document.getElementById('link_button').addEventListener('click', SDP_link_start);
 
 async function store_offer(BODY) {
     const url = "https://gyrogames.arnavium.workers.dev/api/";
