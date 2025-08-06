@@ -172,7 +172,8 @@ function send_data_stream() {
         then = now - (elapsed % fpsInterval);
 
         document.getElementById("Orientation_a").textContent = orientation_data.alpha;
-        sendData(orientation_data.alpha);
+        //sendData(orientation_data.alpha);
+        sendData(Date.now());
     }
 }
 
