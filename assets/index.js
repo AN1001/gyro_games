@@ -76,7 +76,6 @@ let generateOffer = async () => {
     const DATA = { "SDP_OFFER": peerConnection.localDescription }
     let generated_code = await store_offer(DATA);
     document.getElementById("generated_code").textContent = generated_code;
-
 }
 
 let createAnswer = async () => {
@@ -93,6 +92,15 @@ let createAnswer = async () => {
 
     let answer = await peerConnection.createAnswer();
     await peerConnection.setLocalDescription(answer);
+}
+let generateAnswer = async () => {
+    code = document.getElementById('enter-code').value;
+    offer = await get_offer(code);
+
+    await peerConnection.setRemoteDescription(offer);
+    let answer = await peerConnection.createAnswer();
+    await peerConnection.setLocalDescription(answer);
+    store_answer(offer, answer);
 }
 
 let addAnswer = async () => {
@@ -167,6 +175,7 @@ start_data_stream(10);
 
 
 document.getElementById('gen_code').addEventListener('click', generateOffer);
+document.getElementById('add_code').addEventListener('click', generateAnswer);
 
 async function store_offer(BODY) {
     const url = "https://gyrogames.arnavium.workers.dev/api/";
@@ -193,4 +202,35 @@ async function store_offer(BODY) {
             console.error("Error:", error);
             return "Error";
         });
+}
+
+async function get_offer(CODE) {
+    const url = "https://gyrogames.arnavium.workers.dev/api/";
+    const options = {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+          	"SDP_CODE":CODE,
+        }
+    };
+
+    return fetch(url, options)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json(); // or response.text() if not JSON
+        })
+        .then(data => {
+            console.log("Success");
+			      return data["SDP_OFFER"];
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            return "Error";
+        });
+}
+
+async function store_answer(offer, answer){
+    console.log(`Answer: ${answer}`);
 }
