@@ -71,9 +71,9 @@ let generateOffer = async () => {
     setupDataChannelHandlers(dataChannel);
 
     const offer = await peerConnection.createOffer();
-    console.log(`Offer: ${offer}`);
     await peerConnection.setLocalDescription(offer);
     const DATA = { "SDP_OFFER": peerConnection.localDescription }
+    console.log(`Offer: ${JSON.stringify(peerConnection.localDescription)}`);
     let generated_code = await store_offer(DATA);
     document.getElementById("generated_code").textContent = generated_code;
 }
@@ -105,7 +105,7 @@ let generateAnswer = async () => {
     await peerConnection.setLocalDescription(answer);
     let state = await store_answer(code, offer, answer);
     if(state=="Ok"){
-        console.log(`Answer: ${answer}`)
+        console.log(`Answer: ${JSON.stringify(answer)}`)
     } else {
         document.getElementById('generated_code').textContent = "Invalid Code";
     }
