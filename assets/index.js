@@ -270,8 +270,8 @@ async function get_offer(CODE) {
 async function store_answer(code, offer, answer) {
     const url = "https://gyrogames.arnavium.workers.dev/api/";
     const BODY = {
-        SDP_OFFER: offer,
-        SDP_ANSWER: answer
+        "SDP_OFFER": offer,
+        "SDP_ANSWER": answer
     }
     const options = {
         method: "PUT",
