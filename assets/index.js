@@ -127,10 +127,7 @@ function setupDataChannelHandlers(channel) {
     };
 
     channel.onmessage = (event) => {
-        console.log("Received data:", event.data);
-        // Display received data in the UI
-        document.getElementById('received-data').textContent = event.data;
-        console.log(event.data);
+        on_receive_data(event.data);
     };
 }
 
@@ -264,4 +261,35 @@ async function store_answer(code, offer, answer){
             console.error("Error:", error);
             return "Error";
         });
+}
+
+async function get_answer(CODE) {
+    const url = "https://gyrogames.arnavium.workers.dev/api/";
+    const options = {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+          	"SDP_CODE":CODE,
+        }
+    };
+
+    return fetch(url, options)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json(); // or response.text() if not JSON
+        })
+        .then(data => {
+            console.log("Success");
+			      return JSON.parse(data["SDP_ANSWER"]);
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            return "Error";
+        });
+}
+
+function on_receive_data(data){
+    document.getElementById('received-data').textContent = data;
 }
