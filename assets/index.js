@@ -105,7 +105,7 @@ let generateAnswer = async () => {
     let answer = await peerConnection.createAnswer();
     await peerConnection.setLocalDescription(answer);
     let state = await store_answer(code, offer, answer);
-    if(state=="Ok"){
+    if (state == "Ok") {
         console.log(`Answer: ${JSON.stringify(answer)}`)
     } else {
         document.getElementById('generated_code').textContent = "Invalid Code";
@@ -123,10 +123,10 @@ let addAnswer = async () => {
 
 let SDP_link_start = async () => {
     console.log('Link Started');
-    
+
     let CODE = document.getElementById('generated_code').textContent;
     let answer = await get_answer(CODE);
-
+    console.log('answer:', JSON.stringify(answer));
     if (!peerConnection.currentRemoteDescription) {
         peerConnection.setRemoteDescription(answer);
     }
@@ -228,7 +228,7 @@ async function get_offer(CODE) {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
-          	"SDP_CODE":CODE,
+            "SDP_CODE": CODE,
         }
     };
 
@@ -241,7 +241,7 @@ async function get_offer(CODE) {
         })
         .then(data => {
             console.log("Success");
-			return data["SDP_OFFER"];
+            return data["SDP_OFFER"];
         })
         .catch(error => {
             console.error("Error:", error);
@@ -249,17 +249,17 @@ async function get_offer(CODE) {
         });
 }
 
-async function store_answer(code, offer, answer){
+async function store_answer(code, offer, answer) {
     const url = "https://gyrogames.arnavium.workers.dev/api/";
     const BODY = {
-        "SDP_OFFER":JSON.stringify(offer),
-        "SDP_ANSWER":JSON.stringify(answer)
+        "SDP_OFFER": JSON.stringify(offer),
+        "SDP_ANSWER": JSON.stringify(answer)
     }
     const options = {
         method: "PUT",
         headers: {
             "Content-Type": "application/json",
-            "SDP_CODE":code,
+            "SDP_CODE": code,
         },
         body: JSON.stringify(BODY) // Convert the object to a JSON string
     };
@@ -287,7 +287,7 @@ async function get_answer(CODE) {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
-          	"SDP_CODE":CODE,
+            "SDP_CODE": CODE,
         }
     };
 
@@ -300,7 +300,7 @@ async function get_answer(CODE) {
         })
         .then(data => {
             console.log("Success");
-			      return JSON.parse(data["SDP_ANSWER"]);
+            return JSON.parse(data["SDP_ANSWER"]);
         })
         .catch(error => {
             console.error("Error:", error);
@@ -308,6 +308,6 @@ async function get_answer(CODE) {
         });
 }
 
-function on_receive_data(data){
+function on_receive_data(data) {
     document.getElementById('received-data').textContent = data;
 }
