@@ -41,6 +41,7 @@ let init = async () => {
 
     peerConnection.oniceconnectionstatechange = () => {
         console.log("ICE connection state:", peerConnection.iceConnectionState);
+        document.getElementById("generated_code").textContent = peerConnection.iceConnectionState;
     };
 
     peerConnection.onicecandidateerror = (event) => {
