@@ -55,22 +55,6 @@ let init = async () => {
     };
 }
 
-let createOffer = async () => {
-    // Create a data channel (only needed by the offerer)
-    dataChannel = peerConnection.createDataChannel("dataChannel");
-    setupDataChannelHandlers(dataChannel);
-
-    const offer = await peerConnection.createOffer();
-    await peerConnection.setLocalDescription(offer);
-    document.getElementById('offer-sdp').value = JSON.stringify(peerConnection.localDescription);
-    console.log(offer);
-
-    const DATA = { "SDP_OFFER": peerConnection.localDescription }
-    console.log(`Offer: ${JSON.stringify(peerConnection.localDescription)}`);
-    let generated_code = await store_offer(DATA);
-    document.getElementById("generated_code").textContent = generated_code;
-}
-
 let generateOffer = async () => {
     // Create a data channel (only needed by the offerer)
     dataChannel = peerConnection.createDataChannel("dataChannel");
@@ -84,38 +68,6 @@ let generateOffer = async () => {
     document.getElementById("generated_code").textContent = generated_code;
 }
 
-let createAnswer = async () => {
-    let offer = JSON.parse(document.getElementById('offer-sdp').value);
-    code = document.getElementById('enter-code').value;
-    let offer2 = await get_offer(code);
-    console.log(JSON.stringify(offer), JSON.stringify(offer2))
-
-    peerConnection.onicecandidate = async (event) => {
-        if (event.candidate) {
-            console.log('Adding answer candidate...:', event.candidate);
-            document.getElementById('answer-sdp').value = JSON.stringify(peerConnection.localDescription);
-        }
-        if (!event.candidate) {
-            console.log("ICE final added")
-            code = document.getElementById('enter-code').value;
-            let offer2 = await get_offer(code);
-
-            document.getElementById('answer-sdp').value = JSON.stringify(peerConnection.localDescription);
-            
-            let state = await store_answer(code, offer2, peerConnection.localDescription.toJSON());
-            if (state == "Ok") {
-                console.log(`Answer: ${JSON.stringify(answer)}`)
-            } else {
-                document.getElementById('generated_code').textContent = "Invalid Code";
-            }
-        }
-    };
-
-    await peerConnection.setRemoteDescription(offer2);
-    let answer = await peerConnection.createAnswer();
-    await peerConnection.setLocalDescription(answer);
-}
-
 let generateAnswer = async () => {
     code = document.getElementById('enter-code').value;
     //TODO error handle
@@ -125,9 +77,9 @@ let generateAnswer = async () => {
         if (!event.candidate) {
             console.log("ICE final added")
             code = document.getElementById('enter-code').value;
-            let offer2 = await get_offer(code);
+            let offer = await get_offer(code);
             
-            let state = await store_answer(code, offer2, peerConnection.localDescription.toJSON());
+            let state = await store_answer(code, offer, peerConnection.localDescription.toJSON());
             if (state == "Ok") {
                 console.log(`Store answer success`)
             } else {
@@ -139,19 +91,6 @@ let generateAnswer = async () => {
     await peerConnection.setRemoteDescription(offer);
     let answer = await peerConnection.createAnswer();
     await peerConnection.setLocalDescription(answer);
-}
-
-let addAnswer = async () => {
-    console.log('Add answer triggered');
-    let answer = JSON.parse(document.getElementById('answer-sdp').value);
-    let CODE = document.getElementById('generated_code').textContent;
-    let answer2 = await get_answer(CODE);
-    console.log(JSON.stringify(answer), JSON.stringify(answer2))
-
-    console.log('answer:', answer);
-    if (!peerConnection.currentRemoteDescription) {
-        peerConnection.setRemoteDescription(answer2);
-    }
 }
 
 let SDP_link_start = async () => {
@@ -211,17 +150,13 @@ function send_data_stream() {
 
 init();
 
-document.getElementById('create-offer').addEventListener('click', createOffer);
-document.getElementById('create-answer').addEventListener('click', createAnswer);
-document.getElementById('add-answer').addEventListener('click', addAnswer);
-
 window.addEventListener('beforeunload', () => {
     if (dataChannel) dataChannel.close();
     if (peerConnection) peerConnection.close();
 });
 
-start_data_stream(10);
-
+const updates_per_second = 10;
+start_data_stream(updates_per_second);
 
 document.getElementById('gen_code').addEventListener('click', generateOffer);
 document.getElementById('add_code').addEventListener('click', generateAnswer);
@@ -367,43 +302,6 @@ async function get_answer(CODE) {
             rawError: error // Preserve original error
         };
     }
-}
-
-async function get_answer_old(CODE) {
-    const url = "https://gyrogames.arnavium.workers.dev/api/";
-    const options = {
-        method: "GET",
-        headers: {
-            "Content-Type": "application/json",
-            "SDP_CODE": CODE,
-        }
-    };
-
-    return fetch(url, options)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log("Success");
-            // Check if SDP_ANSWER is a string that needs parsing
-            if (typeof data["SDP_ANSWER"] === 'string') {
-                try {
-                    return JSON.parse(data["SDP_ANSWER"]);
-                } catch (e) {
-                    console.warn("SDP_ANSWER wasn't valid JSON:", data["SDP_ANSWER"]);
-                    return data["SDP_ANSWER"]; // return as-is if not JSON
-                }
-            }
-            // If it's already an object, return directly
-            return data["SDP_ANSWER"];
-        })
-        .catch(error => {
-            console.error("Error:", error);
-            return { error: error.message }; // Better to return error object
-        });
 }
 
 function on_receive_data(data) {
