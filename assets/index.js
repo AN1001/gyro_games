@@ -88,26 +88,27 @@ let createAnswer = async () => {
     let offer = JSON.parse(document.getElementById('offer-sdp').value);
     code = document.getElementById('enter-code').value;
     let offer2 = await get_offer(code);
-    console.log(JSON.stringify(offer),JSON.stringify(offer2))
+    console.log(JSON.stringify(offer), JSON.stringify(offer2))
 
     peerConnection.onicecandidate = async (event) => {
         if (event.candidate) {
             console.log('Adding answer candidate...:', event.candidate);
             document.getElementById('answer-sdp').value = JSON.stringify(peerConnection.localDescription);
         }
+        if (!event.candidate) {
+            let answer = await peerConnection.createAnswer();
+            await peerConnection.setLocalDescription(answer);
+            document.getElementById('answer-sdp').value = JSON.stringify(peerConnection.localDescription);
+            let state = await store_answer(code, offer2, peerConnection.localDescription.toJSON());
+            if (state == "Ok") {
+                console.log(`Answer: ${JSON.stringify(answer)}`)
+            } else {
+                document.getElementById('generated_code').textContent = "Invalid Code";
+            }
+        }
     };
 
     await peerConnection.setRemoteDescription(offer2);
-
-    let answer = await peerConnection.createAnswer();
-    await peerConnection.setLocalDescription(answer);
-    document.getElementById('answer-sdp').value = JSON.stringify(peerConnection.localDescription);
-    let state = await store_answer(code, offer2, peerConnection.localDescription.toJSON());
-    if (state == "Ok") {
-        console.log(`Answer: ${JSON.stringify(answer)}`)
-    } else {
-        document.getElementById('generated_code').textContent = "Invalid Code";
-    }
 }
 
 let generateAnswer = async () => {
@@ -131,7 +132,7 @@ let addAnswer = async () => {
     let answer = JSON.parse(document.getElementById('answer-sdp').value);
     let CODE = document.getElementById('generated_code').textContent;
     let answer2 = await get_answer(CODE);
-    console.log(JSON.stringify(answer),JSON.stringify(answer2))
+    console.log(JSON.stringify(answer), JSON.stringify(answer2))
 
     console.log('answer:', answer);
     if (!peerConnection.currentRemoteDescription) {
@@ -311,7 +312,7 @@ async function get_answer(CODE) {
 
     try {
         const response = await fetch(url, options);
-        
+
         // First check HTTP status
         if (!response.ok) {
             const errorText = await response.text();
@@ -324,10 +325,10 @@ async function get_answer(CODE) {
 
         // Parse once
         const data = JSON.parse(responseText);
-        
+
         // Handle SDP_ANSWER
         const sdpAnswer = data.SDP_ANSWER;
-        
+
         if (!sdpAnswer) {
             throw new Error("Missing SDP_ANSWER in response");
         }
@@ -347,7 +348,7 @@ async function get_answer(CODE) {
 
     } catch (error) {
         console.error("get_answer failed:", error);
-        return { 
+        return {
             error: true,
             message: error.message,
             rawError: error // Preserve original error
@@ -366,30 +367,30 @@ async function get_answer_old(CODE) {
     };
 
     return fetch(url, options)
-    .then(response => {
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
-    })
-    .then(data => {
-        console.log("Success");
-        // Check if SDP_ANSWER is a string that needs parsing
-        if (typeof data["SDP_ANSWER"] === 'string') {
-            try {
-                return JSON.parse(data["SDP_ANSWER"]);
-            } catch (e) {
-                console.warn("SDP_ANSWER wasn't valid JSON:", data["SDP_ANSWER"]);
-                return data["SDP_ANSWER"]; // return as-is if not JSON
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
-        }
-        // If it's already an object, return directly
-        return data["SDP_ANSWER"];
-    })
-    .catch(error => {
-        console.error("Error:", error);
-        return { error: error.message }; // Better to return error object
-    });
+            return response.json();
+        })
+        .then(data => {
+            console.log("Success");
+            // Check if SDP_ANSWER is a string that needs parsing
+            if (typeof data["SDP_ANSWER"] === 'string') {
+                try {
+                    return JSON.parse(data["SDP_ANSWER"]);
+                } catch (e) {
+                    console.warn("SDP_ANSWER wasn't valid JSON:", data["SDP_ANSWER"]);
+                    return data["SDP_ANSWER"]; // return as-is if not JSON
+                }
+            }
+            // If it's already an object, return directly
+            return data["SDP_ANSWER"];
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            return { error: error.message }; // Better to return error object
+        });
 }
 
 function on_receive_data(data) {
