@@ -102,7 +102,7 @@ let createAnswer = async () => {
     let answer = await peerConnection.createAnswer();
     await peerConnection.setLocalDescription(answer);
     document.getElementById('answer-sdp').value = JSON.stringify(peerConnection.localDescription);
-    let state = await store_answer(code, offer, peerConnection.localDescription.toJSON());
+    let state = await store_answer(code, offer2, peerConnection.localDescription.toJSON());
     if (state == "Ok") {
         console.log(`Answer: ${JSON.stringify(answer)}`)
     } else {
