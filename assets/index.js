@@ -97,7 +97,7 @@ let createAnswer = async () => {
         }
     };
 
-    await peerConnection.setRemoteDescription(offer);
+    await peerConnection.setRemoteDescription(offer2);
 
     let answer = await peerConnection.createAnswer();
     await peerConnection.setLocalDescription(answer);
