@@ -94,9 +94,14 @@ let createAnswer = async () => {
         if (event.candidate) {
             console.log('Adding answer candidate...:', event.candidate);
             document.getElementById('answer-sdp').value = JSON.stringify(peerConnection.localDescription);
-            let answer = await peerConnection.createAnswer();
-            await peerConnection.setLocalDescription(answer);
+        }
+        if (!event.candidate) {
+            console.log("ICE final added")
+            code = document.getElementById('enter-code').value;
+            let offer2 = await get_offer(code);
+
             document.getElementById('answer-sdp').value = JSON.stringify(peerConnection.localDescription);
+            
             let state = await store_answer(code, offer2, peerConnection.localDescription.toJSON());
             if (state == "Ok") {
                 console.log(`Answer: ${JSON.stringify(answer)}`)
@@ -107,6 +112,8 @@ let createAnswer = async () => {
     };
 
     await peerConnection.setRemoteDescription(offer2);
+    let answer = await peerConnection.createAnswer();
+    await peerConnection.setLocalDescription(answer);
 }
 
 let generateAnswer = async () => {
