@@ -135,7 +135,7 @@ let addAnswer = async () => {
 
     console.log('answer:', answer);
     if (!peerConnection.currentRemoteDescription) {
-        peerConnection.setRemoteDescription(answer);
+        peerConnection.setRemoteDescription(answer2);
     }
 }
 
