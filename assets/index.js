@@ -94,8 +94,6 @@ let createAnswer = async () => {
         if (event.candidate) {
             console.log('Adding answer candidate...:', event.candidate);
             document.getElementById('answer-sdp').value = JSON.stringify(peerConnection.localDescription);
-        }
-        if (!event.candidate) {
             let answer = await peerConnection.createAnswer();
             await peerConnection.setLocalDescription(answer);
             document.getElementById('answer-sdp').value = JSON.stringify(peerConnection.localDescription);
