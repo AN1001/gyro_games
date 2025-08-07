@@ -121,15 +121,24 @@ let generateAnswer = async () => {
     //TODO error handle
     offer = await get_offer(code);
 
+    peerConnection.onicecandidate = async (event) => {
+        if (!event.candidate) {
+            console.log("ICE final added")
+            code = document.getElementById('enter-code').value;
+            let offer2 = await get_offer(code);
+            
+            let state = await store_answer(code, offer2, peerConnection.localDescription.toJSON());
+            if (state == "Ok") {
+                console.log(`Store answer success`)
+            } else {
+                document.getElementById('generated_code').textContent = "Invalid Code";
+            }
+        }
+    };
+
     await peerConnection.setRemoteDescription(offer);
     let answer = await peerConnection.createAnswer();
     await peerConnection.setLocalDescription(answer);
-    let state = await store_answer(code, offer, answer);
-    if (state == "Ok") {
-        console.log(`Answer: ${JSON.stringify(answer)}`)
-    } else {
-        document.getElementById('generated_code').textContent = "Invalid Code";
-    }
 }
 
 let addAnswer = async () => {
