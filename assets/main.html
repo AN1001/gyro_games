@@ -3,24 +3,28 @@
 
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, user-scalable=0">
   <title>Demo</title>
   <link href="style.css" rel="stylesheet">
   <title>JavaScript Sensor Access Demo</title>
 </head>
 
 <body>
-  <main role="main" class="container">
+  <section class="pc-code-box" id="pc_code_box">
+    <div id="generated_code">---</div>
+    <button id="gen_code">Generate Code</button>
+    <button id="link_button">Link!</button>
+  </section>
+
+  <section class="mobile-code-box" id="mobile_code_box">
+    <textarea id="enter-code" placeholder='Enter Code' spellcheck="false"></textarea>
+    <button id="add_code">Add code</button>
+  </section>
+
+  <main id="orientation" class="container">
     <span id="Orientation_a">0</span><span>&deg;</span>
   </main>
-
   <div id="received-data">Received data will appear here</div>
-
-  <button id="gen_code">Generate Code</button>
-  <div id="generated_code">Code will be here</div>
-  <textarea id="enter-code" placeholder='Enter Code'></textarea>
-  <button id="add_code">Add code</button>
-  <button id="link_button">Link!</button>
 
   <script src="index.js"></script>
 </body>

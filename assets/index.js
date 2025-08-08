@@ -9,14 +9,20 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Get all relevant elements
+    const pc_code_box = document.getElementById('pc_code_box');
+    const mobile_code_box = document.getElementById('mobile_code_box');
     const generatedCode = document.getElementById('generated_code');
     const genCode = document.getElementById('gen_code');
     const enterCode = document.getElementById('enter-code');
     const addCode = document.getElementById('add_code');
     const linkButton = document.getElementById('link_button');
+    const Orientation = document.getElementById('orientation');
+    const received_data = document.getElementById('received-data');
 
     if (isMobileDevice()) {
         // Mobile behavior - only show enter-code and add_code
+        if (pc_code_box) pc_code_box.style.display = 'none';
+        if (received_data) received_data.style.display = 'none';
         if (enterCode) enterCode.style.display = 'block';
         if (addCode) addCode.style.display = 'block';
         
@@ -28,6 +34,8 @@ document.addEventListener('DOMContentLoaded', function() {
         // No click handlers for mobile
     } else {
         // PC behavior
+        if (mobile_code_box) mobile_code_box.style.display = 'none';
+        if (Orientation) Orientation.style.display = 'none';
         if (enterCode) enterCode.style.display = 'none';
         if (addCode) addCode.style.display = 'none';
         if (generatedCode) generatedCode.style.display = 'block';
@@ -233,7 +241,7 @@ async function store_offer(BODY) {
         })
         .catch(error => {
             console.error("Error:", error);
-            return "Error";
+            return "ERR";
         });
 }
 
