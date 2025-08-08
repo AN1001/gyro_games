@@ -126,7 +126,6 @@ let generateOffer = async () => {
 let generateAnswer = async () => {
     request_access();
     code = document.getElementById('enter-code').value;
-    //TODO error handle
     offer = await get_offer(code);
 
     peerConnection.onicecandidate = async (event) => {
@@ -138,15 +137,22 @@ let generateAnswer = async () => {
             let state = await store_answer(code, offer, peerConnection.localDescription.toJSON());
             if (state == "Ok") {
                 console.log(`Store answer success`)
+                document.getElementById("enter-code").value = '✅';
             } else {
                 document.getElementById('generated_code').textContent = "Invalid Code";
             }
         }
     };
 
-    await peerConnection.setRemoteDescription(offer);
-    let answer = await peerConnection.createAnswer();
-    await peerConnection.setLocalDescription(answer);
+    if(offer!="ERR"){
+        await peerConnection.setRemoteDescription(offer);
+        let answer = await peerConnection.createAnswer();
+        await peerConnection.setLocalDescription(answer);
+    } else {
+        console.log("Invalid Code")
+        document.getElementById("enter-code").value = '';
+        document.getElementById("enter-code").placeholder = 'Invalid';
+    }
 }
 
 let SDP_link_start = async () => {
@@ -268,7 +274,7 @@ async function get_offer(CODE) {
         })
         .catch(error => {
             console.error("Error:", error);
-            return "Error";
+            return "ERR";
         });
 }
 
