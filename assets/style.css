@@ -1,6 +1,7 @@
 * {
     margin: 0;
     padding: 0;
+    font-family: monospace;
 }
 
 .pc-code-box {
@@ -49,7 +50,7 @@
     border: 1px solid #ddd;
 }
 
-#received-data-holder {
+#received-data-holder, #orientation {
     font-family: monospace;
     display: inline-block;
     padding: 8px 12px;
@@ -82,3 +83,9 @@
     background: whitesmoke;
     padding: 20px;
 }
+
+@media (max-width: 400px) {
+    #instructions-box{
+        flex-direction: column;
+    } 
+ }

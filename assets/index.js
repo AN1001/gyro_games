@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const addCode = document.getElementById('add_code');
     const linkButton = document.getElementById('link_button');
     const Orientation = document.getElementById('orientation');
-    const received_data = document.getElementById('received-data');
+    const received_data = document.getElementById('received-data-holder');
 
     if (isMobileDevice()) {
         // Mobile behavior - only show enter-code and add_code
