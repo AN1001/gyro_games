@@ -143,8 +143,6 @@ let generateOffer = async () => {
 
 let generateAnswer = async () => {
     await request_access();
-    code = document.getElementById('enter-code').value;
-    offer = await get_offer(code);
 
     peerConnection.onicecandidate = async (event) => {
         if (!event.candidate) {
@@ -166,6 +164,9 @@ let generateAnswer = async () => {
             }
         }
     };
+
+    code = document.getElementById('enter-code').value;
+    offer = await get_offer(code);
 
     if (offer != "ERR") {
         await peerConnection.setRemoteDescription(offer);
