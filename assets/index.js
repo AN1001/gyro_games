@@ -2,7 +2,7 @@
 let accelerometer_data = { x: 0, y: 0, z: 0 };
 let orientation_data = { alpha: 0, beta: 0, gamma: 0 };
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Function to check if the device is mobile
     function isMobileDevice() {
         return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
@@ -25,12 +25,12 @@ document.addEventListener('DOMContentLoaded', function() {
         if (received_data) received_data.style.display = 'none';
         if (enterCode) enterCode.style.display = 'block';
         if (addCode) addCode.style.display = 'block';
-        
+
         // Hide all other elements
         if (generatedCode) generatedCode.style.display = 'none';
         if (genCode) genCode.style.display = 'none';
         if (linkButton) linkButton.style.display = 'none';
-        
+
         // No click handlers for mobile
     } else {
         // PC behavior
@@ -39,32 +39,50 @@ document.addEventListener('DOMContentLoaded', function() {
         if (enterCode) enterCode.style.display = 'none';
         if (addCode) addCode.style.display = 'none';
         if (generatedCode) generatedCode.style.display = 'block';
-        
+
         // Initially show gen_code and hide link_button on PC
         if (genCode) genCode.style.display = 'block';
         if (linkButton) linkButton.style.display = 'none';
 
         // When gen_code is clicked, hide it and show link_button
         if (genCode && linkButton) {
-            genCode.addEventListener('click', function() {
+            genCode.addEventListener('click', function () {
                 this.style.display = 'none';
                 linkButton.style.display = 'block';
             });
-            
+
             // No action when link_button is clicked (per request)
-            linkButton.addEventListener('click', function(e) {
+            linkButton.addEventListener('click', function (e) {
                 e.preventDefault(); // Prevent any default behavior
                 // No other action - button stays visible
             });
         }
     }
 });
-function request_access() {
+function request_access_old() {
     if (
         DeviceMotionEvent &&
         typeof DeviceMotionEvent.requestPermission === "function"
     ) {
         DeviceMotionEvent.requestPermission();
+    }
+}
+async function request_access() {
+    if (DeviceMotionEvent && typeof DeviceMotionEvent.requestPermission === "function") {
+        // Some browsers might support checking permission state directly
+        if (typeof navigator.permissions?.query === "function") {
+            const permission = await navigator.permissions.query({ name: 'accelerometer' });
+            if (permission.state === 'granted') {
+                return; // Already granted
+            }
+        }
+        
+        // Otherwise proceed with request
+        try {
+            await DeviceMotionEvent.requestPermission();
+        } catch (error) {
+            console.error('Permission request failed:', error);
+        }
     }
 }
 function updateMotion(event) {
@@ -139,18 +157,26 @@ let generateAnswer = async () => {
                 console.log(`Store answer success`)
                 document.getElementById("enter-code").value = '✅';
             } else {
-                document.getElementById('generated_code').textContent = "Invalid Code";
+                console.log("Invalid Code")
+                document.getElementById("enter-code").value = 'Invalid';
+                window.setTimeout(function () {
+                    document.getElementById("enter-code").value = '';
+                }, 500)
+                document.getElementById("enter-code").placeholder = 'Invalid';
             }
         }
     };
 
-    if(offer!="ERR"){
+    if (offer != "ERR") {
         await peerConnection.setRemoteDescription(offer);
         let answer = await peerConnection.createAnswer();
         await peerConnection.setLocalDescription(answer);
     } else {
         console.log("Invalid Code")
-        document.getElementById("enter-code").value = '';
+        document.getElementById("enter-code").value = 'Invalid';
+        window.setTimeout(function () {
+            document.getElementById("enter-code").value = '';
+        }, 500)
         document.getElementById("enter-code").placeholder = 'Invalid';
     }
 }
