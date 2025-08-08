@@ -142,6 +142,7 @@ let generateOffer = async () => {
 }
 
 let generateAnswer = async () => {
+    try{
     await request_access();
 
     peerConnection.onicecandidate = async (event) => {
@@ -180,6 +181,8 @@ let generateAnswer = async () => {
         }, 500)
         document.getElementById("enter-code").placeholder = 'Invalid';
     }
+} catch (err) { console.error(err); document.getElementById('enter-code').value=err; }
+
 }
 
 let SDP_link_start = async () => {
