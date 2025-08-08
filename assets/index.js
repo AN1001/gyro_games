@@ -367,5 +367,5 @@ async function get_answer(CODE) {
 }
 
 function on_receive_data(data) {
-    document.getElementById('received-data').textContent = data.toFixed(2);
+    document.getElementById('received-data').textContent = Number.parseFloat(data).toFixed(2);
 }
