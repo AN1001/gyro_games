@@ -2,7 +2,7 @@
 let accelerometer_data = { x: 0, y: 0, z: 0 };
 let orientation_data = { alpha: 0, beta: 0, gamma: 0 };
 
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function() {
     // Function to check if the device is mobile
     function isMobileDevice() {
         return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
@@ -15,37 +15,40 @@ document.addEventListener('DOMContentLoaded', function () {
     const addCode = document.getElementById('add_code');
     const linkButton = document.getElementById('link_button');
 
-    // Initially hide link_button on mobile
-    if (isMobileDevice() && linkButton) {
-        linkButton.style.display = 'none';
-    }
-
-    // Set initial visibility based on device type
     if (isMobileDevice()) {
-        // Mobile - show mobile elements
+        // Mobile behavior - only show enter-code and add_code
         if (enterCode) enterCode.style.display = 'block';
         if (addCode) addCode.style.display = 'block';
-
-        // Hide computer elements
+        
+        // Hide all other elements
         if (generatedCode) generatedCode.style.display = 'none';
         if (genCode) genCode.style.display = 'none';
-
-        // Add click handler for add_code to toggle visibility
-        if (addCode) {
-            addCode.addEventListener('click', function () {
-                this.style.display = 'none';
-                if (linkButton) linkButton.style.display = 'block';
-            });
-        }
+        if (linkButton) linkButton.style.display = 'none';
+        
+        // No click handlers for mobile
     } else {
-        // Computer - show computer elements
-        if (generatedCode) generatedCode.style.display = 'block';
-        if (genCode) genCode.style.display = 'block';
-
-        // Hide mobile elements
+        // PC behavior
         if (enterCode) enterCode.style.display = 'none';
         if (addCode) addCode.style.display = 'none';
+        if (generatedCode) generatedCode.style.display = 'block';
+        
+        // Initially show gen_code and hide link_button on PC
+        if (genCode) genCode.style.display = 'block';
         if (linkButton) linkButton.style.display = 'none';
+
+        // When gen_code is clicked, hide it and show link_button
+        if (genCode && linkButton) {
+            genCode.addEventListener('click', function() {
+                this.style.display = 'none';
+                linkButton.style.display = 'block';
+            });
+            
+            // No action when link_button is clicked (per request)
+            linkButton.addEventListener('click', function(e) {
+                e.preventDefault(); // Prevent any default behavior
+                // No other action - button stays visible
+            });
+        }
     }
 });
 function request_access() {
