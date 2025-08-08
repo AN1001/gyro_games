@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 });
-function request_access_old() {
+function request_access() {
     if (
         DeviceMotionEvent &&
         typeof DeviceMotionEvent.requestPermission === "function"
@@ -67,7 +67,7 @@ function request_access_old() {
         DeviceMotionEvent.requestPermission();
     }
 }
-async function request_access() {
+async function request_access_new() {
     if (DeviceMotionEvent && typeof DeviceMotionEvent.requestPermission === "function") {
         // Some browsers might support checking permission state directly
         if (typeof navigator.permissions?.query === "function") {
