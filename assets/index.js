@@ -1,17 +1,61 @@
-if (
-    DeviceMotionEvent &&
-    typeof DeviceMotionEvent.requestPermission === "function"
-) {
-    DeviceMotionEvent.requestPermission();
-}
-document.getElementById('request_access').addEventListener('click', function () {
-    DeviceMotionEvent.requestPermission();
-});
-
 //Handle Sensor Data
 let accelerometer_data = { x: 0, y: 0, z: 0 };
 let orientation_data = { alpha: 0, beta: 0, gamma: 0 };
 
+document.addEventListener('DOMContentLoaded', function () {
+    // Function to check if the device is mobile
+    function isMobileDevice() {
+        return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    }
+
+    // Get all relevant elements
+    const generatedCode = document.getElementById('generated_code');
+    const genCode = document.getElementById('gen_code');
+    const enterCode = document.getElementById('enter-code');
+    const addCode = document.getElementById('add_code');
+    const linkButton = document.getElementById('link_button');
+
+    // Initially hide link_button on mobile
+    if (isMobileDevice() && linkButton) {
+        linkButton.style.display = 'none';
+    }
+
+    // Set initial visibility based on device type
+    if (isMobileDevice()) {
+        // Mobile - show mobile elements
+        if (enterCode) enterCode.style.display = 'block';
+        if (addCode) addCode.style.display = 'block';
+
+        // Hide computer elements
+        if (generatedCode) generatedCode.style.display = 'none';
+        if (genCode) genCode.style.display = 'none';
+
+        // Add click handler for add_code to toggle visibility
+        if (addCode) {
+            addCode.addEventListener('click', function () {
+                this.style.display = 'none';
+                if (linkButton) linkButton.style.display = 'block';
+            });
+        }
+    } else {
+        // Computer - show computer elements
+        if (generatedCode) generatedCode.style.display = 'block';
+        if (genCode) genCode.style.display = 'block';
+
+        // Hide mobile elements
+        if (enterCode) enterCode.style.display = 'none';
+        if (addCode) addCode.style.display = 'none';
+        if (linkButton) linkButton.style.display = 'none';
+    }
+});
+function request_access() {
+    if (
+        DeviceMotionEvent &&
+        typeof DeviceMotionEvent.requestPermission === "function"
+    ) {
+        DeviceMotionEvent.requestPermission();
+    }
+}
 function updateMotion(event) {
     accelerometer_data.x = event.acceleration.x;
     accelerometer_data.y = event.acceleration.y;
@@ -69,6 +113,7 @@ let generateOffer = async () => {
 }
 
 let generateAnswer = async () => {
+    request_access();
     code = document.getElementById('enter-code').value;
     //TODO error handle
     offer = await get_offer(code);
@@ -78,7 +123,7 @@ let generateAnswer = async () => {
             console.log("ICE final added")
             code = document.getElementById('enter-code').value;
             let offer = await get_offer(code);
-            
+
             let state = await store_answer(code, offer, peerConnection.localDescription.toJSON());
             if (state == "Ok") {
                 console.log(`Store answer success`)
