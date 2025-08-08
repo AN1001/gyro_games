@@ -205,7 +205,7 @@ function send_data_stream() {
     if (elapsed > fpsInterval) {
         then = now - (elapsed % fpsInterval);
 
-        document.getElementById("Orientation_a").textContent = orientation_data.alpha;
+        document.getElementById("Orientation_a").textContent = orientation_data.alpha.toFixed(2);
         sendData(orientation_data.alpha);
     }
 }
@@ -367,5 +367,5 @@ async function get_answer(CODE) {
 }
 
 function on_receive_data(data) {
-    document.getElementById('received-data').textContent = data;
+    document.getElementById('received-data').textContent = data.toFixed(2);
 }
