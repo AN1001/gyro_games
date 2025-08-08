@@ -142,7 +142,7 @@ let generateOffer = async () => {
 }
 
 let generateAnswer = async () => {
-    request_access();
+    await request_access();
     code = document.getElementById('enter-code').value;
     offer = await get_offer(code);
 
@@ -151,8 +151,8 @@ let generateAnswer = async () => {
             console.log("ICE final added")
             code = document.getElementById('enter-code').value;
             let offer = await get_offer(code);
+            const state = await store_answer(code, offer, peerConnection.localDescription.toJSON());
 
-            let state = await store_answer(code, offer, peerConnection.localDescription.toJSON());
             if (state == "Ok") {
                 console.log(`Store answer success`)
                 document.getElementById("enter-code").value = '✅';
