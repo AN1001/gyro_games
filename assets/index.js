@@ -76,7 +76,7 @@ async function request_access_new() {
                 return; // Already granted
             }
         }
-        
+
         // Otherwise proceed with request
         try {
             await DeviceMotionEvent.requestPermission();
@@ -142,46 +142,46 @@ let generateOffer = async () => {
 }
 
 let generateAnswer = async () => {
-    try{
-    await request_access();
+    try {
+        await request_access();
 
-    peerConnection.onicecandidate = async (event) => {
-        if (!event.candidate) {
-            console.log("ICE final added")
-            code = document.getElementById('enter-code').value;
-            let offer = await get_offer(code);
-            const state = await store_answer(code, offer, peerConnection.localDescription.toJSON());
+        peerConnection.onicecandidate = async (event) => {
+            if (!event.candidate) {
+                console.log("ICE final added")
+                code = document.getElementById('enter-code').value;
+                let offer = await get_offer(code);
+                const state = await store_answer(code, offer, peerConnection.localDescription.toJSON());
 
-            if (state == "Ok") {
-                console.log(`Store answer success`)
-                document.getElementById("enter-code").value = '✅';
-            } else {
-                console.log("Invalid Code")
-                document.getElementById("enter-code").value = 'Invalid';
-                window.setTimeout(function () {
-                    document.getElementById("enter-code").value = '';
-                }, 500)
-                document.getElementById("enter-code").placeholder = 'Invalid';
+                if (state == "Ok") {
+                    console.log(`Store answer success`)
+                    document.getElementById("enter-code").value = '✅';
+                } else {
+                    console.log("Invalid Code")
+                    document.getElementById("enter-code").value = 'Invalid';
+                    window.setTimeout(function () {
+                        document.getElementById("enter-code").value = '';
+                    }, 500)
+                    document.getElementById("enter-code").placeholder = 'Invalid';
+                }
             }
+        };
+
+        code = document.getElementById('enter-code').value;
+        offer = await get_offer(code);
+
+        if (offer != "ERR") {
+            await peerConnection.setRemoteDescription(offer);
+            let answer = await peerConnection.createAnswer();
+            await peerConnection.setLocalDescription(answer);
+        } else {
+            console.log("Invalid Code")
+            document.getElementById("enter-code").value = 'Invalid';
+            window.setTimeout(function () {
+                document.getElementById("enter-code").value = '';
+            }, 500)
+            document.getElementById("enter-code").placeholder = 'Invalid';
         }
-    };
-
-    code = document.getElementById('enter-code').value;
-    offer = await get_offer(code);
-
-    if (offer != "ERR") {
-        await peerConnection.setRemoteDescription(offer);
-        let answer = await peerConnection.createAnswer();
-        await peerConnection.setLocalDescription(answer);
-    } else {
-        console.log("Invalid Code")
-        document.getElementById("enter-code").value = 'Invalid';
-        window.setTimeout(function () {
-            document.getElementById("enter-code").value = '';
-        }, 500)
-        document.getElementById("enter-code").placeholder = 'Invalid';
-    }
-} catch (err) { console.error(err); document.getElementById('enter-code').value=err; }
+    } catch (err) { console.error(err); document.getElementById('enter-code').value = err; }
 
 }
 
@@ -235,8 +235,10 @@ function send_data_stream() {
     if (elapsed > fpsInterval) {
         then = now - (elapsed % fpsInterval);
 
-        document.getElementById("Orientation_a").textContent = orientation_data.alpha.toFixed(2);
-        sendData(orientation_data.alpha);
+        if (orientation_data.alpha) {
+            document.getElementById("Orientation_a").textContent = orientation_data.alpha.toFixed(2);
+            sendData(orientation_data.alpha);
+        }
     }
 }
 
