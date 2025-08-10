@@ -141,6 +141,19 @@ let generateOffer = async () => {
 
     const offer = await peerConnection.createOffer();
     await peerConnection.setLocalDescription(offer);
+    await new Promise((resolve) => {
+        if (peerConnection.iceGatheringState === "complete") {
+            resolve();
+        } else {
+            peerConnection.onicegatheringstatechange = () => {
+                if (peerConnection.iceGatheringState === "complete") {
+                    console.log("ICE gathering complete");
+                    resolve();
+                }
+            };
+        }
+    });
+
     const DATA = { "SDP_OFFER": peerConnection.localDescription }
     console.log(`Offer: ${JSON.stringify(peerConnection.localDescription)}`);
     let generated_code = await store_offer(DATA);
@@ -224,8 +237,6 @@ let generateAnswer = async () => {
 
             // 4. Now the SDP has all candidates included
             console.log("Final SDP with candidates:", peerConnection.localDescription.sdp);
-
-            // 5. Send the answer
             const state = await store_answer(code, offer, peerConnection.localDescription.toJSON());
 
             if (state == "Ok") {
