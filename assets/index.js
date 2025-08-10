@@ -100,9 +100,7 @@ window.addEventListener("deviceorientation", updateOrientation);
 
 //WebRTC
 let peerConnection = new RTCPeerConnection({
-    iceServers: [
-        
-    ]
+    iceServers: [],
 });
 
 let dataChannel;
@@ -139,7 +137,7 @@ let generateOffer = async () => {
     document.getElementById("generated_code").textContent = generated_code;
 }
 
-let generateAnswer = async () => {
+let generateAnswer_old = async () => {
     try {
         await request_access();
 
@@ -164,6 +162,7 @@ let generateAnswer = async () => {
             }
         };
 
+
         code = document.getElementById('enter-code').value;
         offer = await get_offer(code);
 
@@ -182,6 +181,67 @@ let generateAnswer = async () => {
     } catch (err) { console.error(err); document.getElementById('enter-code').value = err; }
 
 }
+
+let generateAnswer = async () => {
+    try {
+        await request_access();
+
+        code = document.getElementById('enter-code').value;
+        offer = await get_offer(code);
+
+        if (offer != "ERR") {
+            await peerConnection.setRemoteDescription(offer);
+
+            // 1. Create the answer (but don't set it yet)
+            let answer = await peerConnection.createAnswer();
+
+            // 2. Set local description (triggers ICE gathering)
+            await peerConnection.setLocalDescription(answer);
+
+            // 3. Wait for ICE gathering to finish
+            await new Promise((resolve) => {
+                if (peerConnection.iceGatheringState === "complete") {
+                    resolve();
+                } else {
+                    peerConnection.onicegatheringstatechange = () => {
+                        if (peerConnection.iceGatheringState === "complete") {
+                            console.log("ICE gathering complete");
+                            resolve();
+                        }
+                    };
+                }
+            });
+
+            // 4. Now the SDP has all candidates included
+            console.log("Final SDP with candidates:", peerConnection.localDescription.sdp);
+
+            // 5. Send the answer
+            const state = await store_answer(code, offer, peerConnection.localDescription.toJSON());
+
+            if (state == "Ok") {
+                console.log(`Store answer success`);
+                document.getElementById("enter-code").value = '✅';
+            } else {
+                console.log("Invalid Code");
+                document.getElementById("enter-code").value = 'Invalid';
+                window.setTimeout(function () {
+                    document.getElementById("enter-code").value = '';
+                }, 500);
+                document.getElementById("enter-code").placeholder = 'Invalid';
+            }
+        } else {
+            console.log("Invalid Code");
+            document.getElementById("enter-code").value = 'Invalid';
+            window.setTimeout(function () {
+                document.getElementById("enter-code").value = '';
+            }, 500);
+            document.getElementById("enter-code").placeholder = 'Invalid';
+        }
+    } catch (err) {
+        console.error(err);
+        document.getElementById('enter-code').value = err;
+    }
+};
 
 let SDP_link_start = async () => {
     console.log('Link Started');
