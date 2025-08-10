@@ -102,7 +102,7 @@ window.addEventListener("deviceorientation", updateOrientation);
 let peerConnection = new RTCPeerConnection({
     iceServers: [],
     iceTransportPolicy: "all",
-    iceCandidatePoolSize: 0 
+    iceCandidatePoolSize: 0
 });
 
 let dataChannel;
@@ -117,6 +117,14 @@ let init = async () => {
 
     peerConnection.onicecandidateerror = (event) => {
         console.error("ICE candidate error:", event);
+    };
+
+    peerConnection.onicecandidate = (e) => {
+        if (e.candidate) {
+            console.log("New candidate:", e.candidate.candidate); // Should show LAN IPs
+        } else {
+            console.log("All candidates gathered");
+        }
     };
 
     peerConnection.ondatachannel = (event) => {
