@@ -101,6 +101,8 @@ window.addEventListener("deviceorientation", updateOrientation);
 //WebRTC
 let peerConnection = new RTCPeerConnection({
     iceServers: [],
+    iceTransportPolicy: "all",
+    iceCandidatePoolSize: 0 
 });
 
 let dataChannel;
