@@ -11,47 +11,9 @@ let accelerometer_data = { x: 0, y: 0, z: 0 };
 let orientation_data = { alpha: 0, beta: 0, gamma: 0 };
 let CURRENT_CODE = undefined;
 
-const pc_code_box = document.getElementById('pc_code_box');
-const mobile_code_box = document.getElementById('mobile_code_box');
-const generatedCode = document.getElementById('generated_code');
-const genCode = document.getElementById('gen_code');
 const enterCode = document.getElementById('enter-code');
-const addCode = document.getElementById('add_code');
-const linkButton = document.getElementById('link_button');
-const Orientation = document.getElementById('orientation');
-const received_data = document.getElementById('received-data-holder');
 const received_data_text = document.getElementById('received-data');
 
-document.addEventListener('DOMContentLoaded', function () {
-    // Function to check if the device is mobile
-    function isMobileDevice() {
-        return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-    }
-
-    if (isMobileDevice()) {
-        if (enterCode) enterCode.style.display = 'block';
-        if (addCode) addCode.style.display = 'block';
-
-        [pc_code_box, received_data, generatedCode, genCode, linkButton].forEach(function(el){
-            if(el) el.style.display = 'none';
-        })
-
-    } else {
-        [mobile_code_box, Orientation, enterCode, addCode, linkButton].forEach(function(el){
-            if(el) el.style.display = 'none';
-        })
-        
-        if (generatedCode) generatedCode.style.display = 'block';
-        if (genCode) genCode.style.display = 'block';
-
-        if (genCode && linkButton) {
-            genCode.addEventListener('click', function () {
-                this.style.display = 'none';
-                linkButton.style.display = 'block';
-            });
-        }
-    }
-});
 function request_access() {
     if (
         DeviceMotionEvent &&
@@ -136,7 +98,7 @@ let generateOffer = async () => {
     const DATA = { "SDP_OFFER": peerConnection.localDescription }
     console.log(`Offer: ${JSON.stringify(peerConnection.localDescription)}`);
     let generated_code = await store_offer(DATA);
-    generatedCode.textContent = generated_code;
+    document.getElementById('generated_code').textContent = generated_code;
     CURRENT_CODE = generated_code;
 }
 
@@ -260,9 +222,9 @@ window.addEventListener('beforeunload', () => {
 const updates_per_second = 10;
 start_data_stream(updates_per_second);
 
-genCode.addEventListener('click', generateOffer);
-addCode.addEventListener('click', generateAnswer);
-linkButton.addEventListener('click', SDP_link_start);
+document.getElementById('gen_code').addEventListener('click', generateOffer);
+document.getElementById('add_code').addEventListener('click', generateAnswer);
+document.getElementById('link_button').addEventListener('click', SDP_link_start);
 
 function on_receive_data(data) {
     received_data_text.textContent = Number.parseFloat(data).toFixed(2);
