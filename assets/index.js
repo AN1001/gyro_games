@@ -171,6 +171,8 @@ let SDP_link_start = async () => {
 function setupDataChannelHandlers(channel) {
     channel.onopen = () => {
         console.log("Data channel opened!");
+        const updates_per_second = 10;
+        start_data_stream(updates_per_second, channel);
         // You can now send data through the channel
     };
 
@@ -182,8 +184,6 @@ function setupDataChannelHandlers(channel) {
         on_receive_data(event.data);
     };
 
-    const updates_per_second = 10;
-    start_data_stream(updates_per_second, channel);
 }
 
 function sendData(data_to_send, data_channel) {
