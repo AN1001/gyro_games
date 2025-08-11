@@ -1,6 +1,7 @@
 //Handle Sensor Data
 let accelerometer_data = { x: 0, y: 0, z: 0 };
 let orientation_data = { alpha: 0, beta: 0, gamma: 0 };
+let CURRENT_CODE = null;
 
 document.addEventListener('DOMContentLoaded', function () {
     // Function to check if the device is mobile
@@ -116,7 +117,7 @@ let init = async () => {
 
     peerConnection.oniceconnectionstatechange = () => {
         console.log("ICE connection state:", peerConnection.iceConnectionState);
-        document.getElementById("generated_code").textContent = peerConnection.iceConnectionState;
+        document.getElementById("ice_connection_state_data").textContent = peerConnection.iceConnectionState;
     };
 
     peerConnection.onicecandidateerror = (event) => {
@@ -162,6 +163,7 @@ let generateOffer = async () => {
     console.log(`Offer: ${JSON.stringify(peerConnection.localDescription)}`);
     let generated_code = await store_offer(DATA);
     document.getElementById("generated_code").textContent = generated_code;
+    CURRENT_CODE = generated_code;
 }
 
 let generateAnswer_old = async () => {
@@ -270,7 +272,7 @@ function show_invalid_code() {
 let SDP_link_start = async () => {
     console.log('Link Started');
 
-    let CODE = document.getElementById('generated_code').textContent;
+    let CODE = CURRENT_CODE;
     let answer = await get_answer(CODE);
     console.log('answer:', JSON.stringify(answer));
     if (!peerConnection.currentRemoteDescription) {
