@@ -72,7 +72,7 @@ let init = async () => {
 
     peerConnection.ondatachannel = (event) => {
         console.log("Data channel received!");
-        data_channel = event.channel;
+        const data_channel = event.channel;
         setupDataChannelHandlers(data_channel);
     };
 }
