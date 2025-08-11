@@ -78,7 +78,7 @@ let init = async () => {
 }
 
 let generateOffer = async () => {
-    data_channel = peerConnection.createDataChannel("data_channel");
+    const data_channel = peerConnection.createDataChannel("data_channel");
     setupDataChannelHandlers(data_channel);
 
     const offer = await peerConnection.createOffer();
