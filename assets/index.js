@@ -100,7 +100,11 @@ window.addEventListener("deviceorientation", updateOrientation);
 
 //WebRTC
 let peerConnection = new RTCPeerConnection({
-    iceServers: [],
+    iceServers: [
+        { urls: "stun:stun.l.google.com:19302" },
+        { urls: "stun:stun1.l.google.com:19302" },
+        { urls: "stun:stun2.l.google.com:19302" }
+    ],
     iceTransportPolicy: "all",
     iceCandidatePoolSize: 0
 });
@@ -243,26 +247,25 @@ let generateAnswer = async () => {
                 console.log(`Store answer success`);
                 document.getElementById("enter-code").value = '✅';
             } else {
-                console.log("Invalid Code");
-                document.getElementById("enter-code").value = 'Invalid';
-                window.setTimeout(function () {
-                    document.getElementById("enter-code").value = '';
-                }, 500);
-                document.getElementById("enter-code").placeholder = 'Invalid';
+                show_invalid_code();
             }
         } else {
-            console.log("Invalid Code");
-            document.getElementById("enter-code").value = 'Invalid';
-            window.setTimeout(function () {
-                document.getElementById("enter-code").value = '';
-            }, 500);
-            document.getElementById("enter-code").placeholder = 'Invalid';
+            show_invalid_code();
         }
     } catch (err) {
         console.error(err);
         document.getElementById('enter-code').value = err;
     }
 };
+
+function show_invalid_code() {
+    console.log("Invalid Code");
+    document.getElementById("enter-code").value = 'Invalid';
+    window.setTimeout(function () {
+        document.getElementById("enter-code").value = '';
+    }, 500);
+    document.getElementById("enter-code").placeholder = 'Invalid';
+}
 
 let SDP_link_start = async () => {
     console.log('Link Started');
