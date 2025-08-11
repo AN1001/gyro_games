@@ -101,9 +101,6 @@ let generateOffer = async () => {
     let generated_code = await store_offer(DATA);
     document.getElementById('generated_code').textContent = generated_code;
     CURRENT_CODE = generated_code;
-
-    const updates_per_second = 10;
-    start_data_stream(updates_per_second, data_channel);
 }
 
 let generateAnswer = async () => {
@@ -184,9 +181,10 @@ function setupDataChannelHandlers(channel) {
     channel.onmessage = (event) => {
         on_receive_data(event.data);
     };
+
+    start_data_stream(updates_per_second, channel);
 }
 
-// Function to send data through the data channel
 function sendData(data_to_send, data_channel) {
     if (data_channel && data_channel.readyState === "open") {
         data_channel.send(data_to_send);

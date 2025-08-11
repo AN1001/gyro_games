@@ -7,7 +7,6 @@ const addCode = document.getElementById('add_code');
 const linkButton = document.getElementById('link_button');
 const Orientation = document.getElementById('orientation');
 const received_data = document.getElementById('received-data-holder');
-const received_data_text = document.getElementById('received-data');
 
 document.addEventListener('DOMContentLoaded', function () {
     // Function to check if the device is mobile
