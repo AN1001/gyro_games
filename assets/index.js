@@ -168,7 +168,7 @@ let generateAnswer = async () => {
             });
 
             console.log("Final SDP with all candidates:", peerConnection.localDescription.sdp);
-            const state = await store_answer(code, offer, peerConnection.localDescription.toJSON());
+            const state = await store_answer(CURRENT_CODE, offer, peerConnection.localDescription.toJSON());
 
             if (state === "Ok") {
                 console.log(`Store answer success`);
