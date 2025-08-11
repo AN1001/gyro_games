@@ -182,6 +182,7 @@ function setupDataChannelHandlers(channel) {
         on_receive_data(event.data);
     };
 
+    const updates_per_second = 10;
     start_data_stream(updates_per_second, channel);
 }
 
