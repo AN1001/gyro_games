@@ -1,7 +1,25 @@
+import { 
+    store_offer, 
+    get_offer, 
+    store_answer, 
+    get_answer 
+} from './database_methods.js';
+
 //Handle Sensor Data
 let accelerometer_data = { x: 0, y: 0, z: 0 };
 let orientation_data = { alpha: 0, beta: 0, gamma: 0 };
-let CURRENT_CODE = null;
+let CURRENT_CODE = undefined;
+
+const pc_code_box = document.getElementById('pc_code_box');
+const mobile_code_box = document.getElementById('mobile_code_box');
+const generatedCode = document.getElementById('generated_code');
+const genCode = document.getElementById('gen_code');
+const enterCode = document.getElementById('enter-code');
+const addCode = document.getElementById('add_code');
+const linkButton = document.getElementById('link_button');
+const Orientation = document.getElementById('orientation');
+const received_data = document.getElementById('received-data-holder');
+const received_data_text = document.getElementById('received-data');
 
 document.addEventListener('DOMContentLoaded', function () {
     // Function to check if the device is mobile
@@ -9,53 +27,26 @@ document.addEventListener('DOMContentLoaded', function () {
         return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
     }
 
-    // Get all relevant elements
-    const pc_code_box = document.getElementById('pc_code_box');
-    const mobile_code_box = document.getElementById('mobile_code_box');
-    const generatedCode = document.getElementById('generated_code');
-    const genCode = document.getElementById('gen_code');
-    const enterCode = document.getElementById('enter-code');
-    const addCode = document.getElementById('add_code');
-    const linkButton = document.getElementById('link_button');
-    const Orientation = document.getElementById('orientation');
-    const received_data = document.getElementById('received-data-holder');
-
     if (isMobileDevice()) {
-        // Mobile behavior - only show enter-code and add_code
-        if (pc_code_box) pc_code_box.style.display = 'none';
-        if (received_data) received_data.style.display = 'none';
         if (enterCode) enterCode.style.display = 'block';
         if (addCode) addCode.style.display = 'block';
 
-        // Hide all other elements
-        if (generatedCode) generatedCode.style.display = 'none';
-        if (genCode) genCode.style.display = 'none';
-        if (linkButton) linkButton.style.display = 'none';
+        [pc_code_box, received_data, generatedCode, genCode, linkButton].forEach(function(el){
+            if(el) el.style.display = 'none';
+        })
 
-        // No click handlers for mobile
     } else {
-        // PC behavior
-        if (mobile_code_box) mobile_code_box.style.display = 'none';
-        if (Orientation) Orientation.style.display = 'none';
-        if (enterCode) enterCode.style.display = 'none';
-        if (addCode) addCode.style.display = 'none';
+        [mobile_code_box, Orientation, enterCode, addCode, linkButton].forEach(function(el){
+            if(el) el.style.display = 'none';
+        })
+        
         if (generatedCode) generatedCode.style.display = 'block';
-
-        // Initially show gen_code and hide link_button on PC
         if (genCode) genCode.style.display = 'block';
-        if (linkButton) linkButton.style.display = 'none';
 
-        // When gen_code is clicked, hide it and show link_button
         if (genCode && linkButton) {
             genCode.addEventListener('click', function () {
                 this.style.display = 'none';
                 linkButton.style.display = 'block';
-            });
-
-            // No action when link_button is clicked (per request)
-            linkButton.addEventListener('click', function (e) {
-                e.preventDefault(); // Prevent any default behavior
-                // No other action - button stays visible
             });
         }
     }
@@ -66,24 +57,6 @@ function request_access() {
         typeof DeviceMotionEvent.requestPermission === "function"
     ) {
         DeviceMotionEvent.requestPermission();
-    }
-}
-async function request_access_new() {
-    if (DeviceMotionEvent && typeof DeviceMotionEvent.requestPermission === "function") {
-        // Some browsers might support checking permission state directly
-        if (typeof navigator.permissions?.query === "function") {
-            const permission = await navigator.permissions.query({ name: 'accelerometer' });
-            if (permission.state === 'granted') {
-                return; // Already granted
-            }
-        }
-
-        // Otherwise proceed with request
-        try {
-            await DeviceMotionEvent.requestPermission();
-        } catch (error) {
-            console.error('Permission request failed:', error);
-        }
     }
 }
 function updateMotion(event) {
@@ -162,72 +135,24 @@ let generateOffer = async () => {
     const DATA = { "SDP_OFFER": peerConnection.localDescription }
     console.log(`Offer: ${JSON.stringify(peerConnection.localDescription)}`);
     let generated_code = await store_offer(DATA);
-    document.getElementById("generated_code").textContent = generated_code;
+    generatedCode.textContent = generated_code;
     CURRENT_CODE = generated_code;
-}
-
-let generateAnswer_old = async () => {
-    try {
-        await request_access();
-
-        peerConnection.onicecandidate = async (event) => {
-            if (!event.candidate) {
-                console.log("ICE final added")
-                code = document.getElementById('enter-code').value;
-                let offer = await get_offer(code);
-                const state = await store_answer(code, offer, peerConnection.localDescription.toJSON());
-
-                if (state == "Ok") {
-                    console.log(`Store answer success`)
-                    document.getElementById("enter-code").value = '✅';
-                } else {
-                    console.log("Invalid Code")
-                    document.getElementById("enter-code").value = 'Invalid';
-                    window.setTimeout(function () {
-                        document.getElementById("enter-code").value = '';
-                    }, 500)
-                    document.getElementById("enter-code").placeholder = 'Invalid';
-                }
-            }
-        };
-
-
-        code = document.getElementById('enter-code').value;
-        offer = await get_offer(code);
-
-        if (offer != "ERR") {
-            await peerConnection.setRemoteDescription(offer);
-            let answer = await peerConnection.createAnswer();
-            await peerConnection.setLocalDescription(answer);
-        } else {
-            console.log("Invalid Code")
-            document.getElementById("enter-code").value = 'Invalid';
-            window.setTimeout(function () {
-                document.getElementById("enter-code").value = '';
-            }, 500)
-            document.getElementById("enter-code").placeholder = 'Invalid';
-        }
-    } catch (err) { console.error(err); document.getElementById('enter-code').value = err; }
-
 }
 
 let generateAnswer = async () => {
     try {
         await request_access();
 
-        code = document.getElementById('enter-code').value;
+        code = enterCode.value;
         offer = await get_offer(code);
 
-        if (offer != "ERR") {
+        if (offer) {
             await peerConnection.setRemoteDescription(offer);
-
-            // 1. Create the answer (but don't set it yet)
             let answer = await peerConnection.createAnswer();
-
-            // 2. Set local description (triggers ICE gathering)
+            // Set local description (triggers ICE gathering)
             await peerConnection.setLocalDescription(answer);
 
-            // 3. Wait for ICE gathering to finish
+            // Wait for ICE gathering to finish
             await new Promise((resolve) => {
                 if (peerConnection.iceGatheringState === "complete") {
                     resolve();
@@ -247,7 +172,7 @@ let generateAnswer = async () => {
 
             if (state == "Ok") {
                 console.log(`Store answer success`);
-                document.getElementById("enter-code").value = '✅';
+                enterCode.value = '✅';
             } else {
                 show_invalid_code();
             }
@@ -256,17 +181,17 @@ let generateAnswer = async () => {
         }
     } catch (err) {
         console.error(err);
-        document.getElementById('enter-code').value = err;
+        document.getElementById('error_box').value = err;
     }
 };
 
 function show_invalid_code() {
     console.log("Invalid Code");
-    document.getElementById("enter-code").value = 'Invalid';
+    enterCode.value = 'Invalid';
     window.setTimeout(function () {
-        document.getElementById("enter-code").value = '';
+        enterCode.value = '';
     }, 500);
-    document.getElementById("enter-code").placeholder = 'Invalid';
+    enterCode.placeholder = 'Invalid';
 }
 
 let SDP_link_start = async () => {
@@ -336,152 +261,10 @@ window.addEventListener('beforeunload', () => {
 const updates_per_second = 10;
 start_data_stream(updates_per_second);
 
-document.getElementById('gen_code').addEventListener('click', generateOffer);
-document.getElementById('add_code').addEventListener('click', generateAnswer);
-document.getElementById('link_button').addEventListener('click', SDP_link_start);
-
-async function store_offer(BODY) {
-    const url = "https://gyrogames.arnavium.workers.dev/api/";
-    const options = {
-        method: "PUT",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(BODY) // Convert the object to a JSON string
-    };
-
-    return fetch(url, options)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.text(); // or response.text() if not JSON
-        })
-        .then(data => {
-            console.log("Success:", data);
-            return data;
-        })
-        .catch(error => {
-            console.error("Error:", error);
-            return "ERR";
-        });
-}
-
-async function get_offer(CODE) {
-    const url = "https://gyrogames.arnavium.workers.dev/api/";
-    const options = {
-        method: "GET",
-        headers: {
-            "Content-Type": "application/json",
-            "SDP_CODE": CODE,
-        }
-    };
-
-    return fetch(url, options)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json(); // or response.text() if not JSON
-        })
-        .then(data => {
-            console.log("Success");
-            return data["SDP_OFFER"];
-        })
-        .catch(error => {
-            console.error("Error:", error);
-            return "ERR";
-        });
-}
-
-async function store_answer(code, offer, answer) {
-    const url = "https://gyrogames.arnavium.workers.dev/api/";
-    const BODY = {
-        "SDP_OFFER": offer,
-        "SDP_ANSWER": answer
-    }
-    const options = {
-        method: "PUT",
-        headers: {
-            "Content-Type": "application/json",
-            "SDP_CODE": code,
-        },
-        body: JSON.stringify(BODY) // Convert the object to a JSON string
-    };
-
-    return fetch(url, options)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.text(); // or response.text() if not JSON
-        })
-        .then(data => {
-            console.log("Success:", data);
-            return data;
-        })
-        .catch(error => {
-            console.error("Error:", error);
-            return "Error";
-        });
-}
-
-async function get_answer(CODE) {
-    const url = "https://gyrogames.arnavium.workers.dev/api/";
-    const options = {
-        method: "GET",
-        headers: {
-            "Content-Type": "application/json",
-            "SDP_CODE": CODE,
-        }
-    };
-
-    try {
-        const response = await fetch(url, options);
-
-        // First check HTTP status
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`HTTP ${response.status}: ${errorText}`);
-        }
-
-        // Get raw text first for debugging
-        const responseText = await response.text();
-        console.log("Raw API response:", responseText);
-
-        // Parse once
-        const data = JSON.parse(responseText);
-
-        // Handle SDP_ANSWER
-        const sdpAnswer = data.SDP_ANSWER;
-
-        if (!sdpAnswer) {
-            throw new Error("Missing SDP_ANSWER in response");
-        }
-
-        // Case 1: Already parsed object
-        if (typeof sdpAnswer !== 'string') {
-            return sdpAnswer;
-        }
-
-        // Case 2: String that needs parsing
-        try {
-            return JSON.parse(sdpAnswer);
-        } catch (parseError) {
-            console.warn("SDP_ANSWER wasn't valid JSON, returning raw:", sdpAnswer);
-            return sdpAnswer;
-        }
-
-    } catch (error) {
-        console.error("get_answer failed:", error);
-        return {
-            error: true,
-            message: error.message,
-            rawError: error // Preserve original error
-        };
-    }
-}
+genCode.addEventListener('click', generateOffer);
+addCode.addEventListener('click', generateAnswer);
+linkButton.addEventListener('click', SDP_link_start);
 
 function on_receive_data(data) {
-    document.getElementById('received-data').textContent = Number.parseFloat(data).toFixed(2);
+    received_data_text.textContent = Number.parseFloat(data).toFixed(2);
 }
