@@ -145,7 +145,7 @@ let generateAnswer = async () => {
         await request_access();
 
         CURRENT_CODE = enterCode.value;
-        offer = await get_offer(CURRENT_CODE);
+        const offer = await get_offer(CURRENT_CODE);
 
         if (offer) {
             await peerConnection.setRemoteDescription(offer);
@@ -167,11 +167,10 @@ let generateAnswer = async () => {
                 }
             });
 
-            // 4. Now the SDP has all candidates included
-            console.log("Final SDP with candidates:", peerConnection.localDescription.sdp);
+            console.log("Final SDP with all candidates:", peerConnection.localDescription.sdp);
             const state = await store_answer(code, offer, peerConnection.localDescription.toJSON());
 
-            if (state == "Ok") {
+            if (state === "Ok") {
                 console.log(`Store answer success`);
                 enterCode.value = '✅';
             } else {
@@ -230,11 +229,10 @@ function sendData(data_to_send) {
     }
 }
 
-var fpsInterval, startTime, now, then, elapsed;
+let fpsInterval, now, then, elapsed;
 function start_data_stream(updates_per_second) {
     fpsInterval = 1000 / updates_per_second;
     then = Date.now();
-    startTime = then;
     send_data_stream();
 }
 function send_data_stream() {
