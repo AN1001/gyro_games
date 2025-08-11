@@ -1,9 +1,9 @@
 "use strict";
-import { 
-    store_offer, 
-    get_offer, 
-    store_answer, 
-    get_answer 
+import {
+    store_offer,
+    get_offer,
+    store_answer,
+    get_answer
 } from './database_methods.js';
 
 //Handle Sensor Data
@@ -36,7 +36,7 @@ window.addEventListener("devicemotion", updateMotion);
 window.addEventListener("deviceorientation", updateOrientation);
 
 //WebRTC
-let peerConnection = new RTCPeerConnection({
+const peerConnection = new RTCPeerConnection({
     iceServers: [
         { urls: "stun:stun.l.google.com:19302" },
         { urls: "stun:stun1.l.google.com:19302" },
@@ -46,7 +46,9 @@ let peerConnection = new RTCPeerConnection({
     iceCandidatePoolSize: 0
 });
 
-let dataChannel;
+window.addEventListener('beforeunload', () => {
+    if (peerConnection) peerConnection.close();
+});
 
 let init = async () => {
     console.log("Initializing WebRTC for data transmission...");
@@ -70,15 +72,14 @@ let init = async () => {
 
     peerConnection.ondatachannel = (event) => {
         console.log("Data channel received!");
-        dataChannel = event.channel;
-        setupDataChannelHandlers(dataChannel);
+        data_channel = event.channel;
+        setupDataChannelHandlers(data_channel);
     };
 }
 
 let generateOffer = async () => {
-    // Create a data channel (only needed by the offerer)
-    dataChannel = peerConnection.createDataChannel("dataChannel");
-    setupDataChannelHandlers(dataChannel);
+    data_channel = peerConnection.createDataChannel("data_channel");
+    setupDataChannelHandlers(data_channel);
 
     const offer = await peerConnection.createOffer();
     await peerConnection.setLocalDescription(offer);
@@ -100,6 +101,9 @@ let generateOffer = async () => {
     let generated_code = await store_offer(DATA);
     document.getElementById('generated_code').textContent = generated_code;
     CURRENT_CODE = generated_code;
+
+    const updates_per_second = 10;
+    start_data_stream(updates_per_second, data_channel);
 }
 
 let generateAnswer = async () => {
@@ -183,21 +187,25 @@ function setupDataChannelHandlers(channel) {
 }
 
 // Function to send data through the data channel
-function sendData(data_to_send) {
-    if (dataChannel && dataChannel.readyState === "open") {
-        dataChannel.send(data_to_send);
+function sendData(data_to_send, data_channel) {
+    if (data_channel && data_channel.readyState === "open") {
+        data_channel.send(data_to_send);
     } else {
         console.log("Data channel not ready yet");
     }
 }
 
 let fpsInterval, now, then, elapsed;
-function start_data_stream(updates_per_second) {
+function start_data_stream(updates_per_second, data_channel) {
     fpsInterval = 1000 / updates_per_second;
     then = Date.now();
-    send_data_stream();
+    send_data_stream(data_channel);
+
+    window.addEventListener('beforeunload', () => {
+        if (data_channel) data_channel.close();
+    });
 }
-function send_data_stream() {
+function send_data_stream(data_channel) {
     requestAnimationFrame(send_data_stream);
     now = Date.now();
     elapsed = now - then;
@@ -207,20 +215,13 @@ function send_data_stream() {
 
         if (orientation_data.alpha) {
             document.getElementById("Orientation_a").textContent = orientation_data.alpha.toFixed(2);
-            sendData(orientation_data.alpha);
+            sendData(orientation_data.alpha, data_channel);
         }
     }
 }
 
 init();
 
-window.addEventListener('beforeunload', () => {
-    if (dataChannel) dataChannel.close();
-    if (peerConnection) peerConnection.close();
-});
-
-const updates_per_second = 10;
-start_data_stream(updates_per_second);
 
 document.getElementById('gen_code').addEventListener('click', generateOffer);
 document.getElementById('add_code').addEventListener('click', generateAnswer);
