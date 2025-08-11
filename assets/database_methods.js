@@ -1,3 +1,4 @@
+"use strict";
 const API_BASE_URL = "https://gyrogames.arnavium.workers.dev/api/";
 
 export async function store_offer(BODY) {

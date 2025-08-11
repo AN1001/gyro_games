@@ -1,3 +1,4 @@
+"use strict";
 import { 
     store_offer, 
     get_offer, 
@@ -143,8 +144,8 @@ let generateAnswer = async () => {
     try {
         await request_access();
 
-        code = enterCode.value;
-        offer = await get_offer(code);
+        CURRENT_CODE = enterCode.value;
+        offer = await get_offer(CURRENT_CODE);
 
         if (offer) {
             await peerConnection.setRemoteDescription(offer);
