@@ -220,7 +220,7 @@ function sendData(data_to_send, data_channel) {
     }
 }
 
-const session = new webRTC_session;
+const session = new webRTC_session();
 document.getElementById('gen_code').addEventListener('click', session.generateOffer);
 document.getElementById('add_code').addEventListener('click', session.generateAnswer);
 document.getElementById('link_button').addEventListener('click', session.SDP_link_start);
