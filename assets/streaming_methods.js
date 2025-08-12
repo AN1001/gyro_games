@@ -7,7 +7,7 @@ export function start_data_stream(updates_per_second, data_channel, orientation_
 }
 
 function send_data_stream(data_channel, orientation_data) {
-    requestAnimationFrame(() => send_data_stream(data_channel));
+    requestAnimationFrame(() => send_data_stream(data_channel, orientation_data));
     now = Date.now();
     elapsed = now - then;
 
