@@ -38,6 +38,7 @@ class webRTC_session {
     constructor() {
         this.peer_connection = null;
         this.data_channel = null;
+        // ice_gathering_completion could be a problem if multiple answers generated
         this.ice_gathering_completion = null;
         this.CURRENT_CODE = null;
         this.iceCandidates = [];
@@ -100,7 +101,7 @@ class webRTC_session {
 
     async generateOffer() {
         this.data_channel = this.peer_connection.createDataChannel("data_channel");
-        setupDataChannelHandlers(this.data_channel);
+        this.setupDataChannelHandlers(this.data_channel);
 
         const offer = await this.peer_connection.createOffer();
         await this.peer_connection.setLocalDescription(offer);
@@ -221,9 +222,9 @@ function sendData(data_to_send, data_channel) {
 }
 
 const session = new webRTC_session();
-document.getElementById('gen_code').addEventListener('click', session.generateOffer);
-document.getElementById('add_code').addEventListener('click', session.generateAnswer);
-document.getElementById('link_button').addEventListener('click', session.SDP_link_start);
+document.getElementById('gen_code').addEventListener('click', () => session.generateOffer());
+document.getElementById('add_code').addEventListener('click', () => session.generateAnswer());
+document.getElementById('link_button').addEventListener('click', () => session.SDP_link_start());
 
 function on_receive_data(data) {
     received_data_text.textContent = Number.parseFloat(data).toFixed(2);
