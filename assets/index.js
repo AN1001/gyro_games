@@ -78,7 +78,7 @@ class webRTC_session {
         this.peer_connection.ondatachannel = (event) => {
             console.log("Data channel received!");
             this.data_channel = event.channel;
-            setupDataChannelHandlers(this.data_channel);
+            this.setupDataChannelHandlers(this.data_channel);
         };
 
     }
