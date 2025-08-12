@@ -165,7 +165,7 @@ class webRTC_session {
         channel.onopen = () => {
             console.log("Data channel opened!");
             const updates_per_second = 10;
-            start_data_stream(updates_per_second, channel);
+            start_data_stream(updates_per_second, channel, orientation_data);
             // You can now send data through the channel
         };
 
