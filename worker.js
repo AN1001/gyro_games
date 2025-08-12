@@ -24,7 +24,7 @@ var worker_default = {
         return new Response(data);
       }
     }
-    if (["/main.html", "/index.js", "/style.css", "/database_methods.js"].includes(url.pathname)) {
+    if (["/main.html", "/index.js", "/style.css", "/database_methods.js", "/streaming_methods.js", "/UI_handler.js"].includes(url.pathname)) {
       return env.ASSETS.fetch(request);
     }
     if (url.pathname === "/") {

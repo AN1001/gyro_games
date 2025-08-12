@@ -1,10 +1,6 @@
 "use strict";
-import {
-    store_offer,
-    get_offer,
-    store_answer,
-    get_answer
-} from './database_methods.js';
+import { store_offer, get_offer, store_answer, get_answer } from './database_methods.js';
+import { start_data_stream } from './streaming_methods.js';
 
 //Handle Sensor Data
 let accelerometer_data = { x: 0, y: 0, z: 0 };
@@ -199,35 +195,6 @@ class webRTC_session {
             this.peer_connection.close();
             this.peer_connection = null;
         }
-    }
-}
-
-
-let fpsInterval, now, then, elapsed;
-function start_data_stream(updates_per_second, data_channel) {
-    fpsInterval = 1000 / updates_per_second;
-    then = Date.now();
-    send_data_stream(data_channel);
-}
-function send_data_stream(data_channel) {
-    requestAnimationFrame(() => send_data_stream(data_channel));
-    now = Date.now();
-    elapsed = now - then;
-
-    if (elapsed > fpsInterval) {
-        then = now - (elapsed % fpsInterval);
-
-        if (orientation_data.alpha) {
-            document.getElementById("Orientation_a").textContent = orientation_data.alpha.toFixed(2);
-            sendData(orientation_data.alpha, data_channel);
-        }
-    }
-}
-function sendData(data_to_send, data_channel) {
-    if (data_channel && data_channel.readyState === "open") {
-        data_channel.send(data_to_send);
-    } else {
-        console.log("Data channel not ready yet");
     }
 }
 
