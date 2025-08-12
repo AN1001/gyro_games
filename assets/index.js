@@ -81,18 +81,6 @@ class webRTC_session {
             setupDataChannelHandlers(this.data_channel);
         };
 
-        this.ice_gathering_completion = new Promise((resolve) => {
-            if (this.peer_connection.iceGatheringState === "complete") {
-                resolve();
-            } else {
-                this.peer_connection.onicegatheringstatechange = () => {
-                    if (this.peer_connection.iceGatheringState === "complete") {
-                        console.log("ICE gathering complete");
-                        resolve();
-                    }
-                };
-            }
-        });
     }
 
     handleConnectionFailure() {
@@ -106,6 +94,17 @@ class webRTC_session {
         const offer = await this.peer_connection.createOffer();
         await this.peer_connection.setLocalDescription(offer);
         // Wait for ICE gathering to finish
+        this.ice_gathering_completion = new Promise((resolve) => {
+            if (this.peer_connection.iceGatheringState === "complete") {
+                resolve();
+            } else {
+                this.peer_connection.onicegatheringstatechange = () => {
+                    if (this.peer_connection.iceGatheringState === "complete") {
+                        resolve();
+                    }
+                };
+            }
+        });
         await this.ice_gathering_completion;
 
         const DATA = { "SDP_OFFER": this.peer_connection.localDescription }
@@ -127,6 +126,17 @@ class webRTC_session {
             await this.peer_connection.setLocalDescription(answer);
 
             // Wait for ICE gathering to finish
+            this.ice_gathering_completion = new Promise((resolve) => {
+                if (this.peer_connection.iceGatheringState === "complete") {
+                    resolve();
+                } else {
+                    this.peer_connection.onicegatheringstatechange = () => {
+                        if (this.peer_connection.iceGatheringState === "complete") {
+                            resolve();
+                        }
+                    };
+                }
+            });
             await this.ice_gathering_completion;
 
             console.log("Final SDP with all candidates:", this.peer_connection.localDescription.sdp);
