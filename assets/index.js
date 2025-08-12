@@ -205,7 +205,7 @@ function start_data_stream(updates_per_second, data_channel) {
     });
 }
 function send_data_stream(data_channel) {
-    requestAnimationFrame(send_data_stream);
+    requestAnimationFrame(() => send_data_stream(data_channel));
     now = Date.now();
     elapsed = now - then;
 
