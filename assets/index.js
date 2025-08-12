@@ -1,34 +1,10 @@
 "use strict";
+import { orientation_data, accelerometer_data, request_access } from './sensor_methods.js';
 import { store_offer, get_offer, store_answer, get_answer } from './database_methods.js';
 import { start_data_stream } from './streaming_methods.js';
 
-//Handle Sensor Data
-let accelerometer_data = { x: 0, y: 0, z: 0 };
-let orientation_data = { alpha: 0, beta: 0, gamma: 0 };
-
 const enterCode = document.getElementById('enter-code');
 const received_data_text = document.getElementById('received-data');
-
-function request_access() {
-    if (
-        DeviceMotionEvent &&
-        typeof DeviceMotionEvent.requestPermission === "function"
-    ) {
-        DeviceMotionEvent.requestPermission();
-    }
-}
-function updateMotion(event) {
-    accelerometer_data.x = event.acceleration.x;
-    accelerometer_data.y = event.acceleration.y;
-    accelerometer_data.z = event.acceleration.z;
-}
-function updateOrientation(event) {
-    orientation_data.alpha = event.alpha;
-    orientation_data.beta = event.beta;
-    orientation_data.gamma = event.gamma;
-}
-window.addEventListener("devicemotion", updateMotion);
-window.addEventListener("deviceorientation", updateOrientation);
 
 class webRTC_session {
     constructor() {
