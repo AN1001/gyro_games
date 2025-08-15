@@ -1,5 +1,6 @@
 export const accelerometer_data = { x: 0, y: 0, z: 0 };
 export const orientation_data = { alpha: 0, beta: 0, gamma: 0 };
+export let neutral_alpha = 0;
 
 export function request_access() {
     if (
@@ -8,6 +9,13 @@ export function request_access() {
     ) {
         DeviceMotionEvent.requestPermission();
     }
+}
+export function get_steer_direction(alpha, neutral_alpha){
+    let diff = alpha-neutral_alpha;
+    if(diff>180){
+        return diff-360
+    }
+    return diff
 }
 function updateMotion(event) {
     accelerometer_data.x = event.acceleration.x;
@@ -19,6 +27,10 @@ function updateOrientation(event) {
     orientation_data.beta = event.beta;
     orientation_data.gamma = event.gamma;
 }
+function set_neutral(){
+    neutral_alpha = orientation_data.alpha;
+}
 
 window.addEventListener("devicemotion", updateMotion);
 window.addEventListener("deviceorientation", updateOrientation);
+document.getElementById('set_neutral').addEventListener('click', set_neutral);

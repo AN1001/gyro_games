@@ -1,3 +1,4 @@
+import { get_steer_direction } from './sensor_methods.js';
 const main_area = document.getElementById("game");
 const local_orientation_data = { alpha: 0, beta: 0, gamma: 0 };
 
@@ -46,9 +47,7 @@ export function init_game() {
   function animate() {
     requestAnimationFrame(animate);
 
-    cube.rotation.x = THREE.MathUtils.degToRad(local_orientation_data.beta);
-    cube.rotation.y = THREE.MathUtils.degToRad(local_orientation_data.alpha);
-    cube.rotation.z = -THREE.MathUtils.degToRad(local_orientation_data.gamma);
+    console.log(get_steer_direction(local_orientation_data.alpha), local_orientation_data.gamma);
 
     renderer.render(scene, camera);
   }
