@@ -152,7 +152,7 @@ class webRTC_session {
             if (isMobile()) {
                 init_controller();
             } else {
-                init_game();
+                init_game(orientation_data);
             }
         };
 
