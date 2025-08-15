@@ -2,9 +2,15 @@
 import { orientation_data, accelerometer_data, request_access } from './sensor_methods.js';
 import { store_offer, get_offer, store_answer, get_answer } from './database_methods.js';
 import { start_data_stream } from './streaming_methods.js';
+import { init_controller, init_game } from './game.js';
 
 const enterCode = document.getElementById('enter-code');
 const received_data_text = document.getElementById('received-data');
+
+function isMobile() {
+    const regex = /Mobi|Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
+    return regex.test(navigator.userAgent);
+}
 
 class webRTC_session {
     constructor() {
@@ -40,6 +46,12 @@ class webRTC_session {
             document.getElementById("ice_connection_state_data").textContent = this.peer_connection.iceConnectionState;
             if (this.peer_connection.iceConnectionState === 'failed') {
                 this.handleConnectionFailure();
+            } else if (this.peer_connection.iceConnectionState === 'connected') {
+                if (isMobile()) {
+                    init_controller();
+                } else {
+                    init_game();
+                }
             }
         };
 
