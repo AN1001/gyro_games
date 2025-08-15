@@ -38,9 +38,9 @@ export function init_game() {
   function animate() {
     requestAnimationFrame(animate);
 
-    cube.rotation.x = THREE.MathUtils.degToRad(local_orientation_data.alpha);
-    cube.rotation.y = THREE.MathUtils.degToRad(local_orientation_data.beta);
-    cube.rotation.z = THREE.MathUtils.degToRad(local_orientation_data.gamma);
+    cube.rotation.x = -THREE.MathUtils.degToRad(local_orientation_data.alpha);
+    cube.rotation.y = THREE.MathUtils.degToRad(local_orientation_data.gamma);
+    cube.rotation.z = THREE.MathUtils.degToRad(local_orientation_data.beta);
 
     renderer.render(scene, camera);
   }
