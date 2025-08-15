@@ -1,4 +1,5 @@
 import { orientation_data, accelerometer_data } from './sensor_methods.js';
+
 const main_area = document.getElementById("game");
 
 export function init_game() {
