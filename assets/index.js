@@ -46,12 +46,6 @@ class webRTC_session {
             document.getElementById("ice_connection_state_data").textContent = this.peer_connection.iceConnectionState;
             if (this.peer_connection.iceConnectionState === 'failed') {
                 this.handleConnectionFailure();
-            } else if (this.peer_connection.iceConnectionState === 'connected') {
-                if (isMobile()) {
-                    init_controller();
-                } else {
-                    init_game();
-                }
             }
         };
 
@@ -155,6 +149,11 @@ class webRTC_session {
             const updates_per_second = 10;
             start_data_stream(updates_per_second, channel, orientation_data);
             // You can now send data through the channel
+            if (isMobile()) {
+                init_controller();
+            } else {
+                init_game();
+            }
         };
 
         channel.onclose = () => {
