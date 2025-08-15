@@ -1,6 +1,7 @@
+import { orientation_data, accelerometer_data } from './sensor_methods.js';
 const main_area = document.getElementById("game");
 
-export function init_game(orientation_data) {
+export function init_game() {
   main_area.style.display = "block";
   const scene = new THREE.Scene();
 
@@ -21,8 +22,8 @@ export function init_game(orientation_data) {
   // Position the camera
   camera.position.z = 5;
 
-  function animate(orientation_data) {
-    requestAnimationFrame(() => animate(orientation_data));
+  function animate() {
+    requestAnimationFrame(animate);
 
     cube.rotation.x = orientation_data.alpha;
     cube.rotation.y = orientation_data.beta;
