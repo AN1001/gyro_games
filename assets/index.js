@@ -190,8 +190,8 @@ document.getElementById('gen_code').addEventListener('click', () => session.gene
 document.getElementById('add_code').addEventListener('click', () => session.generateAnswer());
 document.getElementById('link_button').addEventListener('click', () => session.SDP_link_start());
 
-function on_receive_data(data) {
+function on_receive_data(received_orientation_data) {
     received_data_text.textContent = Number.parseFloat(data).toFixed(2);
-    update_orientation_data(orientation_data);
+    update_orientation_data(received_orientation_data);
 }
 

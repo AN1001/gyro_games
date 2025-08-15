@@ -16,7 +16,7 @@ function send_data_stream(data_channel, orientation_data) {
 
         if (orientation_data.alpha) {
             document.getElementById("Orientation_a").textContent = orientation_data.alpha.toFixed(2);
-            sendData(orientation_data.alpha, data_channel);
+            sendData(orientation_data, data_channel);
         }
     }
 }
