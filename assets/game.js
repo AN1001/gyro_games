@@ -1,7 +1,7 @@
 const main_area = document.getElementById("game");
 const local_orientation_data = { alpha: 0, beta: 0, gamma: 0 };
 
-export function update_orientation_data(orientation_data){
+export function update_orientation_data(orientation_data) {
   local_orientation_data.alpha = orientation_data.alpha;
   local_orientation_data.beta = orientation_data.beta;
   local_orientation_data.gamma = orientation_data.gamma;
@@ -21,8 +21,16 @@ export function init_game() {
 
   // Create a cube
   const geometry = new THREE.BoxGeometry();
-  const material = new THREE.MeshStandardMaterial({ color: 0x00ff00 });
-  const cube = new THREE.Mesh(geometry, material);
+  const materials = [
+    new THREE.MeshBasicMaterial({ color: 0x00ff00 }), // Right
+    new THREE.MeshBasicMaterial({ color: 0x00ff00 }), // Left
+    new THREE.MeshBasicMaterial({ color: 0xff0000 }), // Top (red)
+    new THREE.MeshBasicMaterial({ color: 0x00ff00 }), // Bottom
+    new THREE.MeshBasicMaterial({ color: 0x00ff00 }), // Front
+    new THREE.MeshBasicMaterial({ color: 0x00ff00 })  // Back
+  ];
+
+  const cube = new THREE.Mesh(new THREE.BoxGeometry(), materials);
   scene.add(cube);
 
   const ambientLight = new THREE.AmbientLight(0xffffff, 0.5); // Soft overall light
@@ -38,9 +46,9 @@ export function init_game() {
   function animate() {
     requestAnimationFrame(animate);
 
-    cube.rotation.x = -THREE.MathUtils.degToRad(local_orientation_data.beta);
+    cube.rotation.x = THREE.MathUtils.degToRad(local_orientation_data.beta);
     cube.rotation.y = THREE.MathUtils.degToRad(local_orientation_data.alpha);
-    cube.rotation.z = THREE.MathUtils.degToRad(local_orientation_data.gamma);
+    cube.rotation.z = -THREE.MathUtils.degToRad(local_orientation_data.gamma);
 
     renderer.render(scene, camera);
   }
