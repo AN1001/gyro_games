@@ -2,7 +2,7 @@
 import { orientation_data, accelerometer_data, request_access } from './sensor_methods.js';
 import { store_offer, get_offer, store_answer, get_answer } from './database_methods.js';
 import { start_data_stream } from './streaming_methods.js';
-import { init_controller, init_game } from './game.js';
+import { init_controller, init_game, update_orientation_data } from './game.js';
 
 const enterCode = document.getElementById('enter-code');
 const received_data_text = document.getElementById('received-data');
@@ -192,5 +192,6 @@ document.getElementById('link_button').addEventListener('click', () => session.S
 
 function on_receive_data(data) {
     received_data_text.textContent = Number.parseFloat(data).toFixed(2);
+    update_orientation_data(orientation_data);
 }
 

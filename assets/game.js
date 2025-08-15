@@ -1,6 +1,11 @@
-import { orientation_data, accelerometer_data } from './sensor_methods.js';
-
 const main_area = document.getElementById("game");
+const local_orientation_data = { alpha: 0, beta: 0, gamma: 0 };
+
+export function update_orientation_data(orientation_data){
+  local_orientation_data.alpha = orientation_data.alpha;
+  local_orientation_data.beta = orientation_data.beta;
+  local_orientation_data.gamma = orientation_data.gamma;
+}
 
 export function init_game() {
   main_area.style.display = "block";
@@ -26,13 +31,13 @@ export function init_game() {
   function animate() {
     requestAnimationFrame(animate);
 
-    cube.rotation.x = orientation_data.alpha;
-    cube.rotation.y = orientation_data.beta;
+    cube.rotation.x = local_orientation_data.alpha;
+    cube.rotation.y = local_orientation_data.beta;
 
     renderer.render(scene, camera);
   }
 
-  animate(orientation_data);
+  animate();
 }
 
 export function init_controller() {
