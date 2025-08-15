@@ -21,9 +21,16 @@ export function init_game() {
 
   // Create a cube
   const geometry = new THREE.BoxGeometry();
-  const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+  const material = new THREE.MeshStandardMaterial({ color: 0x00ff00 });
   const cube = new THREE.Mesh(geometry, material);
   scene.add(cube);
+
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.5); // Soft overall light
+  scene.add(ambientLight);
+
+  const directionalLight = new THREE.DirectionalLight(0xffffff, 1); // Main light source
+  directionalLight.position.set(1, 1, 1);
+  scene.add(directionalLight);
 
   // Position the camera
   camera.position.z = 5;
@@ -31,8 +38,9 @@ export function init_game() {
   function animate() {
     requestAnimationFrame(animate);
 
-    cube.rotation.x = local_orientation_data.alpha;
-    cube.rotation.y = local_orientation_data.beta;
+    cube.rotation.x = THREE.MathUtils.degToRad(local_orientation_data.alpha);
+    cube.rotation.y = THREE.MathUtils.degToRad(local_orientation_data.beta);
+    cube.rotation.z = THREE.MathUtils.degToRad(local_orientation_data.gamma);
 
     renderer.render(scene, camera);
   }
