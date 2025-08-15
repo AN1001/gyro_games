@@ -21,16 +21,16 @@ export function init_game(orientation_data) {
   // Position the camera
   camera.position.z = 5;
 
-  function animate() {
-    requestAnimationFrame(animate);
+  function animate(orientation_data) {
+    requestAnimationFrame(() => animate(orientation_data));
 
     cube.rotation.x = orientation_data.alpha;
-    cube.rotation.y += orientation_data.beta;
+    cube.rotation.y = orientation_data.beta;
 
     renderer.render(scene, camera);
   }
 
-  animate();
+  animate(orientation_data);
 }
 
 export function init_controller() {

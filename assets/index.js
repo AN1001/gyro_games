@@ -193,3 +193,4 @@ document.getElementById('link_button').addEventListener('click', () => session.S
 function on_receive_data(data) {
     received_data_text.textContent = Number.parseFloat(data).toFixed(2);
 }
+
