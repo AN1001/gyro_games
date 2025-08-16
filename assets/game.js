@@ -1,5 +1,5 @@
 const main_area = document.getElementById("game");
-const local_orientation_data = { alpha: 0, beta: 0, gamma: 0, neutral };
+const local_orientation_data = { alpha: 0, beta: 0, gamma: 0, neutral:0 };
 
 export function update_orientation_data(orientation_data) {
   local_orientation_data.alpha = orientation_data.alpha;
