@@ -1,11 +1,11 @@
 const main_area = document.getElementById("game");
-const local_orientation_data = { alpha: 0, beta: 0, gamma: 0 };
-let neutral_alpha = 0;
+const local_orientation_data = { alpha: 0, beta: 0, gamma: 0, neutral };
 
 export function update_orientation_data(orientation_data) {
   local_orientation_data.alpha = orientation_data.alpha;
   local_orientation_data.beta = orientation_data.beta;
   local_orientation_data.gamma = orientation_data.gamma;
+  local_orientation_data.neutral = orientation_data.neutral;
 }
 
 export function init_game() {
@@ -46,7 +46,7 @@ export function init_game() {
   function animate() {
     requestAnimationFrame(animate);
 
-    console.log(get_steer_direction(local_orientation_data.alpha, neutral_alpha), get_acceleration(local_orientation_data.gamma));
+    console.log(get_steer_direction(local_orientation_data.alpha, local_orientation_data.neutral), get_acceleration(local_orientation_data.gamma));
 
     renderer.render(scene, camera);
   }
@@ -73,8 +73,3 @@ export function get_steer_direction(alpha, neutral_alpha){
     }
     return diff
 }
-
-function set_neutral(){
-    neutral_alpha = local_orientation_data.alpha;
-}
-document.getElementById('set_neutral').addEventListener('click', set_neutral);
