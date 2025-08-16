@@ -1,4 +1,3 @@
-import { get_steer_direction } from './sensor_methods.js';
 const main_area = document.getElementById("game");
 const local_orientation_data = { alpha: 0, beta: 0, gamma: 0 };
 
@@ -9,7 +8,7 @@ export function update_orientation_data(orientation_data) {
 }
 
 export function init_game() {
-  main_area.style.display = "block";
+  //main_area.style.display = "block";
   const scene = new THREE.Scene();
 
   // Create a camera (field of view, aspect ratio, near, far clipping planes)
@@ -21,7 +20,6 @@ export function init_game() {
   renderer.setSize(canvas.clientWidth, canvas.clientHeight);
 
   // Create a cube
-  const geometry = new THREE.BoxGeometry();
   const materials = [
     new THREE.MeshBasicMaterial({ color: 0x00ff00 }), // Right
     new THREE.MeshBasicMaterial({ color: 0x00ff00 }), // Left
@@ -47,7 +45,8 @@ export function init_game() {
   function animate() {
     requestAnimationFrame(animate);
 
-    console.log(get_steer_direction(local_orientation_data.alpha), local_orientation_data.gamma);
+    console.clear();
+    console.log(get_steer_direction(local_orientation_data.alpha), get_acceleration(local_orientation_data.gamma));
 
     renderer.render(scene, camera);
   }
@@ -57,4 +56,16 @@ export function init_game() {
 
 export function init_controller() {
   main_area.style.display = "block";
+}
+
+function get_acceleration(gamma){
+  return gamma/90;
+}
+
+export function get_steer_direction(alpha, neutral_alpha){
+    let diff = alpha-neutral_alpha;
+    if(diff>180){
+        return diff-360
+    }
+    return diff
 }

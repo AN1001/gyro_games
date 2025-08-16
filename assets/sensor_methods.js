@@ -10,13 +10,6 @@ export function request_access() {
         DeviceMotionEvent.requestPermission();
     }
 }
-export function get_steer_direction(alpha, neutral_alpha){
-    let diff = alpha-neutral_alpha;
-    if(diff>180){
-        return diff-360
-    }
-    return diff
-}
 function updateMotion(event) {
     accelerometer_data.x = event.acceleration.x;
     accelerometer_data.y = event.acceleration.y;
