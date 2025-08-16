@@ -46,8 +46,7 @@ export function init_game() {
   function animate() {
     requestAnimationFrame(animate);
 
-    console.clear();
-    console.log(get_steer_direction(local_orientation_data.alpha, ), get_acceleration(local_orientation_data.gamma));
+    console.log(get_steer_direction(local_orientation_data.alpha, neutral_alpha), get_acceleration(local_orientation_data.gamma));
 
     renderer.render(scene, camera);
   }
@@ -63,7 +62,7 @@ function get_acceleration(gamma){
   if(gamma>0){
     return Math.max((gamma-90)/30, -1);
   } else {
-    return Math.max((gamma+90)/45, 1)
+    return Math.min((gamma+90)/45, 1)
   }
 }
 
