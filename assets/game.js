@@ -39,7 +39,6 @@ export function init_game() {
   scene.add(plane);
 
   // Create simple circular race track
-  const trackGroup = new THREE.Group();
 
   const trackPoints = [
     new THREE.Vector3(0, 0, 0),
@@ -50,7 +49,7 @@ export function init_game() {
     new THREE.Vector3(-15, 0, 20),
     new THREE.Vector3(-20, 0, 5),
     new THREE.Vector3(-10, 0, -5),
-];
+  ];
 
   // Create a smooth curve through these points
   const curve = new THREE.CatmullRomCurve3(trackPoints);
@@ -58,45 +57,15 @@ export function init_game() {
   curve.tension = 0.5; // Controls how tight/loose the curves are (0-1)
 
   // Sample points along the curve
-  const trackSegments = 200; // More segments = smoother track
-  const trackWidth = 2
+  const trackWidth = 1
   const trackMaterial = new THREE.MeshLambertMaterial({ color: 0x333333 });
-  const points = curve.getPoints(trackSegments);
 
-  // Create track segments
-  for (let i = 0; i < points.length; i++) {
-    const current = points[i];
-    const next = points[(i + 1) % points.length];
-
-    // Calculate direction vector
-    const direction = new THREE.Vector3().subVectors(next, current);
-    const distance = direction.length();
-
-    if (distance > 0) {
-      // Create track segment
-      const segmentGeometry = new THREE.PlaneGeometry(trackWidth, distance);
-      const segment = new THREE.Mesh(segmentGeometry, trackMaterial);
-
-      // Position segment
-      segment.position.copy(current).add(direction.multiplyScalar(0.5));
-      segment.position.y = 0.01;
-
-      // Rotate to align with direction
-      const angle = Math.atan2(direction.x, direction.z);
-      segment.rotation.x = -Math.PI / 2;
-      segment.rotation.z = angle;
-
-      trackGroup.add(segment);
-    }
-  }
-
-  
   // Create track cross-section shape
   const trackShape = new THREE.Shape();
-  trackShape.moveTo(-trackWidth / 2, 0);
-  trackShape.lineTo(trackWidth / 2, 0);
-  trackShape.lineTo(trackWidth / 2, 0.1);
-  trackShape.lineTo(-trackWidth / 2, 0.1);
+  trackShape.moveTo(0, -trackWidth / 2);
+  trackShape.lineTo(0.1, -trackWidth / 2);
+  trackShape.lineTo(0.1, trackWidth / 2);
+  trackShape.lineTo(0, trackWidth / 2);
   trackShape.closePath();
 
   // Extrude the shape along the curve
@@ -108,11 +77,11 @@ export function init_game() {
 
   const trackGeometry = new THREE.ExtrudeGeometry(trackShape, extrudeSettings);
   const track = new THREE.Mesh(trackGeometry, trackMaterial);
-  track.position.y = 0;
+  track.position.y = 0.05;
   scene.add(track);
 
 
-  
+
   // Create the car
   const car = new THREE.Group();
 

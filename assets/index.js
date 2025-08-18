@@ -195,5 +195,3 @@ function on_receive_data(received_orientation_data) {
     received_data_text.textContent = Number.parseFloat(received_orientation_data.alpha).toFixed(2);
     update_orientation_data(received_orientation_data);
 }
-
-//init_game();
