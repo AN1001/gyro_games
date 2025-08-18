@@ -10,7 +10,6 @@ export function update_orientation_data(orientation_data) {
 
 export function init_game() {
   main_area.style.display = "block";
-  // Scene setup
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0x87CEEB); // Sky blue
 
@@ -34,11 +33,12 @@ export function init_game() {
 
   // Create the ground plane
   const planeGeometry = new THREE.PlaneGeometry(100, 100);
-  const planeMaterial = new THREE.MeshLambertMaterial({ color: 0x90EE90 }); // Light green
+  const planeMaterial = new THREE.MeshLambertMaterial({ color: 0x228B22 }); // Forest green
   const plane = new THREE.Mesh(planeGeometry, planeMaterial);
   plane.rotation.x = -Math.PI / 2;
   scene.add(plane);
 
+  // Create simple circular race track
   const trackGroup = new THREE.Group();
 
   // Track parameters
@@ -58,9 +58,10 @@ export function init_game() {
 
   scene.add(trackGroup);
 
-
   // Create the car
   const car = new THREE.Group();
+
+  // Simple car body (half as wide)
   const bodyGeometry = new THREE.BoxGeometry(1, 0.5, 1);
   const bodyMaterial = new THREE.MeshLambertMaterial({ color: 0x4444ff }); // Blue
   const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
@@ -106,16 +107,85 @@ export function init_game() {
   const cameraHeight = 3;
   const cameraLag = 0.08; // How much lag the camera has (lower = more lag)
 
+  const keys = {
+    up: false,
+    down: false,
+    left: false,
+    right: false
+  };
+
+  // Keyboard event listeners
+  document.addEventListener('keydown', (event) => {
+    switch (event.code) {
+      case 'ArrowUp':
+        keys.up = true;
+        event.preventDefault();
+        break;
+      case 'ArrowDown':
+        keys.down = true;
+        event.preventDefault();
+        break;
+      case 'ArrowLeft':
+        keys.left = true;
+        event.preventDefault();
+        break;
+      case 'ArrowRight':
+        keys.right = true;
+        event.preventDefault();
+        break;
+    }
+  });
+
+  document.addEventListener('keyup', (event) => {
+    switch (event.code) {
+      case 'ArrowUp':
+        keys.up = false;
+        event.preventDefault();
+        break;
+      case 'ArrowDown':
+        keys.down = false;
+        event.preventDefault();
+        break;
+      case 'ArrowLeft':
+        keys.left = false;
+        event.preventDefault();
+        break;
+      case 'ArrowRight':
+        keys.right = false;
+        event.preventDefault();
+        break;
+    }
+  });
+
+  // Handle window resize
+  window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
 
   function animate() {
     requestAnimationFrame(animate);
 
-    // Move forward in the direction the car is facing
-    car.position.x += Math.sin(cubeRotation) * moveSpeed * get_acceleration(local_orientation_data.gamma);
-    car.position.z += Math.cos(cubeRotation) * moveSpeed * get_acceleration(local_orientation_data.gamma);
+    // Handle car-like movement
+    let isMoving = false;
 
-    cubeRotation += rotationSpeed * get_steer_direction();
-  
+    if (keys.up) {
+      // Move forward in the direction the car is facing
+      car.position.x += Math.sin(cubeRotation) * moveSpeed;
+      car.position.z += Math.cos(cubeRotation) * moveSpeed;
+      isMoving = true;
+    }
+    if (keys.down) {
+      // Move backward
+      car.position.x -= Math.sin(cubeRotation) * moveSpeed;
+      car.position.z -= Math.cos(cubeRotation) * moveSpeed;
+      isMoving = true;
+    }
+
+    // Only allow steering when moving
+    cubeRotation += rotationSpeed * get_steer_direction(local_orientation_data.alpha, local_orientation_data.neutral);
+
 
     // Apply rotation to car
     car.rotation.y = cubeRotation;
@@ -163,7 +233,7 @@ function get_acceleration(gamma) {
 function get_steer_direction(alpha, neutral_alpha) {
   let diff = alpha - neutral_alpha;
   if (diff > 180) {
-    return (360 - diff)/30
+    return (360 - diff) / 30
   }
-  return -diff/30
+  return -diff / 30
 }
