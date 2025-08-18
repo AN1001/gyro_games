@@ -9,6 +9,8 @@ export function update_orientation_data(orientation_data) {
 }
 
 export function init_game() {
+  main_area.style.display = "block";
+  // Scene setup
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0x87CEEB); // Sky blue
 
@@ -18,20 +20,16 @@ export function init_game() {
   camera.lookAt(0, 0, 0);
 
   // Renderer setup
-  const renderer = new THREE.WebGLRenderer({ antialias: true });
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-  document.body.appendChild(renderer.domElement);
+  const canvas = document.getElementById('game');
+  const renderer = new THREE.WebGLRenderer({ canvas: canvas });
+  renderer.setSize(canvas.clientWidth, canvas.clientHeight);
 
   // Lighting
   const ambientLight = new THREE.AmbientLight(0x404040, 0.4);
+  scene.add(ambientLight);
+
   const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
   directionalLight.position.set(10, 10, 5);
-  directionalLight.castShadow = true;
-  directionalLight.shadow.mapSize.width = 2048;
-  directionalLight.shadow.mapSize.height = 2048;
-  scene.add(ambientLight);
   scene.add(directionalLight);
 
   // Create the ground plane
@@ -39,112 +37,110 @@ export function init_game() {
   const planeMaterial = new THREE.MeshLambertMaterial({ color: 0x90EE90 }); // Light green
   const plane = new THREE.Mesh(planeGeometry, planeMaterial);
   plane.rotation.x = -Math.PI / 2;
-  plane.receiveShadow = true;
   scene.add(plane);
 
-  // Create the cube
-  const cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
-  const cubeMaterial = new THREE.MeshLambertMaterial({ color: 0xff6b35 }); // Orange
-  const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
-  cube.position.y = 0.5; // Position above the plane
-  cube.castShadow = true;
-  scene.add(cube);
+  const trackGroup = new THREE.Group();
+
+  // Track parameters
+  const outerRadius = 25;
+  const trackWidth = 8;
+  const innerRadius = outerRadius - trackWidth;
+
+  // Track material
+  const trackMaterial = new THREE.MeshLambertMaterial({ color: 0x333333 }); // Dark asphalt
+
+  // Create circular track using ring geometry
+  const trackGeometry = new THREE.RingGeometry(innerRadius, outerRadius, 32);
+  const track = new THREE.Mesh(trackGeometry, trackMaterial);
+  track.rotation.x = -Math.PI / 2;
+  track.position.y = 0.01;
+  trackGroup.add(track);
+
+  scene.add(trackGroup);
+
+
+  // Create the car
+  const car = new THREE.Group();
+  const bodyGeometry = new THREE.BoxGeometry(1, 0.5, 1);
+  const bodyMaterial = new THREE.MeshLambertMaterial({ color: 0x4444ff }); // Blue
+  const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+  body.position.y = 0.5;
+  car.add(body);
+
+  // Wheels
+  const wheelGeometry = new THREE.CylinderGeometry(0.25, 0.25, 0.15, 12);
+  const wheelMaterial = new THREE.MeshLambertMaterial({ color: 0x222222 }); // Dark gray
+
+  // Front wheels (closer together due to narrower car)
+  const frontLeftWheel = new THREE.Mesh(wheelGeometry, wheelMaterial);
+  frontLeftWheel.rotation.z = Math.PI / 2;
+  frontLeftWheel.position.set(-0.6, 0.25, 0.4);
+  car.add(frontLeftWheel);
+
+  const frontRightWheel = new THREE.Mesh(wheelGeometry, wheelMaterial);
+  frontRightWheel.rotation.z = Math.PI / 2;
+  frontRightWheel.position.set(0.6, 0.25, 0.4);
+  car.add(frontRightWheel);
+
+  // Back wheels (closer together due to narrower car)
+  const backLeftWheel = new THREE.Mesh(wheelGeometry, wheelMaterial);
+  backLeftWheel.rotation.z = Math.PI / 2;
+  backLeftWheel.position.set(-0.6, 0.25, -0.4);
+  car.add(backLeftWheel);
+
+  const backRightWheel = new THREE.Mesh(wheelGeometry, wheelMaterial);
+  backRightWheel.rotation.z = Math.PI / 2;
+  backRightWheel.position.set(0.6, 0.25, -0.4);
+  car.add(backRightWheel);
+
+  car.position.y = 0;
+  scene.add(car);
 
   // Movement variables
   const moveSpeed = 0.15;
   const rotationSpeed = 0.03;
   let cubeRotation = 0; // Current rotation of the cube
-  const keys = {
-    up: false,
-    down: false,
-    left: false,
-    right: false
-  };
 
-  // Keyboard event listeners
-  document.addEventListener('keydown', (event) => {
-    switch (event.code) {
-      case 'ArrowUp':
-        keys.up = true;
-        event.preventDefault();
-        break;
-      case 'ArrowDown':
-        keys.down = true;
-        event.preventDefault();
-        break;
-      case 'ArrowLeft':
-        keys.left = true;
-        event.preventDefault();
-        break;
-      case 'ArrowRight':
-        keys.right = true;
-        event.preventDefault();
-        break;
-    }
-  });
+  // Camera lag variables
+  const cameraDistance = 5;
+  const cameraHeight = 3;
+  const cameraLag = 0.08; // How much lag the camera has (lower = more lag)
 
-  document.addEventListener('keyup', (event) => {
-    switch (event.code) {
-      case 'ArrowUp':
-        keys.up = false;
-        event.preventDefault();
-        break;
-      case 'ArrowDown':
-        keys.down = false;
-        event.preventDefault();
-        break;
-      case 'ArrowLeft':
-        keys.left = false;
-        event.preventDefault();
-        break;
-      case 'ArrowRight':
-        keys.right = false;
-        event.preventDefault();
-        break;
-    }
-  });
 
   function animate() {
     requestAnimationFrame(animate);
 
-    // Handle car-like movement
-    let isMoving = false;
+    // Move forward in the direction the car is facing
+    car.position.x += Math.sin(cubeRotation) * moveSpeed * get_acceleration(local_orientation_data.gamma);
+    car.position.z += Math.cos(cubeRotation) * moveSpeed * get_acceleration(local_orientation_data.gamma);
 
-    if (keys.up) {
-      // Move forward in the direction the cube is facing
-      cube.position.x += Math.sin(cubeRotation) * moveSpeed;
-      cube.position.z += Math.cos(cubeRotation) * moveSpeed;
-      isMoving = true;
-    }
-    if (keys.down) {
-      // Move backward
-      cube.position.x -= Math.sin(cubeRotation) * moveSpeed;
-      cube.position.z -= Math.cos(cubeRotation) * moveSpeed;
-      isMoving = true;
-    }
+    cubeRotation += rotationSpeed * get_steer_direction();
+  
 
-    // Only allow steering when moving
-    if (isMoving) {
-      if (keys.left) {
-        cubeRotation += rotationSpeed;
-      }
-      if (keys.right) {
-        cubeRotation -= rotationSpeed;
-      }
-    }
+    // Apply rotation to car
+    car.rotation.y = cubeRotation;
 
-    // Apply rotation to cube
-    cube.rotation.y = cubeRotation;
-
-    // Keep cube within plane bounds
+    // Keep car within plane bounds
     const maxDistance = 45;
-    cube.position.x = Math.max(-maxDistance, Math.min(maxDistance, cube.position.x));
-    cube.position.z = Math.max(-maxDistance, Math.min(maxDistance, cube.position.z));
+    car.position.x = Math.max(-maxDistance, Math.min(maxDistance, car.position.x));
+    car.position.z = Math.max(-maxDistance, Math.min(maxDistance, car.position.z));
 
-    // Update camera to follow the cube (optional - you can remove this for fixed camera)
-    camera.position.x = cube.position.x + 5;
-    camera.position.z = cube.position.z + 5;
-    camera.lookAt(cube.position);
+    // Update camera with simple lag
+    const cameraDistance = 5;
+    const cameraHeight = 3;
+
+    // Calculate target position behind the car
+    const targetX = car.position.x - Math.sin(cubeRotation) * cameraDistance;
+    const targetZ = car.position.z - Math.cos(cubeRotation) * cameraDistance;
+    const targetY = car.position.y + cameraHeight;
+
+    // Smoothly move camera towards target position
+    camera.position.x += (targetX - camera.position.x) * cameraLag;
+    camera.position.y += (targetY - camera.position.y) * cameraLag;
+    camera.position.z += (targetZ - camera.position.z) * cameraLag;
+
+    // Always look at the car
+    camera.lookAt(car.position);
 
     renderer.render(scene, camera);
   }
@@ -167,7 +163,7 @@ function get_acceleration(gamma) {
 function get_steer_direction(alpha, neutral_alpha) {
   let diff = alpha - neutral_alpha;
   if (diff > 180) {
-    return 360 - diff
+    return (360 - diff)/30
   }
-  return -diff
+  return -diff/30
 }

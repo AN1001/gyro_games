@@ -196,3 +196,4 @@ function on_receive_data(received_orientation_data) {
     update_orientation_data(received_orientation_data);
 }
 
+init_game();
