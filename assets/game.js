@@ -41,23 +41,78 @@ export function init_game() {
   // Create simple circular race track
   const trackGroup = new THREE.Group();
 
-  // Track parameters
-  const outerRadius = 25;
-  const trackWidth = 8;
-  const innerRadius = outerRadius - trackWidth;
+  const trackPoints = [
+    new THREE.Vector3(0, 0, 0),
+    new THREE.Vector3(15, 0, 5),
+    new THREE.Vector3(20, 0, 15),
+    new THREE.Vector3(10, 0, 25),
+    new THREE.Vector3(-5, 0, 30),
+    new THREE.Vector3(-15, 0, 20),
+    new THREE.Vector3(-20, 0, 5),
+    new THREE.Vector3(-10, 0, -5),
+];
 
-  // Track material
-  const trackMaterial = new THREE.MeshLambertMaterial({ color: 0x333333 }); // Dark asphalt
+  // Create a smooth curve through these points
+  const curve = new THREE.CatmullRomCurve3(trackPoints);
+  curve.closed = true; // Makes it loop back to start
+  curve.tension = 0.5; // Controls how tight/loose the curves are (0-1)
 
-  // Create circular track using ring geometry
-  const trackGeometry = new THREE.RingGeometry(innerRadius, outerRadius, 32);
+  // Sample points along the curve
+  const trackSegments = 200; // More segments = smoother track
+  const trackWidth = 2
+  const trackMaterial = new THREE.MeshLambertMaterial({ color: 0x333333 });
+  const points = curve.getPoints(trackSegments);
+
+  // Create track segments
+  for (let i = 0; i < points.length; i++) {
+    const current = points[i];
+    const next = points[(i + 1) % points.length];
+
+    // Calculate direction vector
+    const direction = new THREE.Vector3().subVectors(next, current);
+    const distance = direction.length();
+
+    if (distance > 0) {
+      // Create track segment
+      const segmentGeometry = new THREE.PlaneGeometry(trackWidth, distance);
+      const segment = new THREE.Mesh(segmentGeometry, trackMaterial);
+
+      // Position segment
+      segment.position.copy(current).add(direction.multiplyScalar(0.5));
+      segment.position.y = 0.01;
+
+      // Rotate to align with direction
+      const angle = Math.atan2(direction.x, direction.z);
+      segment.rotation.x = -Math.PI / 2;
+      segment.rotation.z = angle;
+
+      trackGroup.add(segment);
+    }
+  }
+
+  
+  // Create track cross-section shape
+  const trackShape = new THREE.Shape();
+  trackShape.moveTo(-trackWidth / 2, 0);
+  trackShape.lineTo(trackWidth / 2, 0);
+  trackShape.lineTo(trackWidth / 2, 0.1);
+  trackShape.lineTo(-trackWidth / 2, 0.1);
+  trackShape.closePath();
+
+  // Extrude the shape along the curve
+  const extrudeSettings = {
+    steps: 100,
+    bevelEnabled: false,
+    extrudePath: curve
+  };
+
+  const trackGeometry = new THREE.ExtrudeGeometry(trackShape, extrudeSettings);
   const track = new THREE.Mesh(trackGeometry, trackMaterial);
-  track.rotation.x = -Math.PI / 2;
-  track.position.y = 0.01;
-  trackGroup.add(track);
+  track.position.y = 0;
+  scene.add(track);
 
-  scene.add(trackGroup);
 
+  
   // Create the car
   const car = new THREE.Group();
 
@@ -102,60 +157,7 @@ export function init_game() {
   const rotationSpeed = 0.03;
   let cubeRotation = 0; // Current rotation of the cube
 
-  // Camera lag variables
-  const cameraDistance = 5;
-  const cameraHeight = 3;
   const cameraLag = 0.08; // How much lag the camera has (lower = more lag)
-
-  const keys = {
-    up: false,
-    down: false,
-    left: false,
-    right: false
-  };
-
-  // Keyboard event listeners
-  document.addEventListener('keydown', (event) => {
-    switch (event.code) {
-      case 'ArrowUp':
-        keys.up = true;
-        event.preventDefault();
-        break;
-      case 'ArrowDown':
-        keys.down = true;
-        event.preventDefault();
-        break;
-      case 'ArrowLeft':
-        keys.left = true;
-        event.preventDefault();
-        break;
-      case 'ArrowRight':
-        keys.right = true;
-        event.preventDefault();
-        break;
-    }
-  });
-
-  document.addEventListener('keyup', (event) => {
-    switch (event.code) {
-      case 'ArrowUp':
-        keys.up = false;
-        event.preventDefault();
-        break;
-      case 'ArrowDown':
-        keys.down = false;
-        event.preventDefault();
-        break;
-      case 'ArrowLeft':
-        keys.left = false;
-        event.preventDefault();
-        break;
-      case 'ArrowRight':
-        keys.right = false;
-        event.preventDefault();
-        break;
-    }
-  });
 
   // Handle window resize
   window.addEventListener('resize', () => {
