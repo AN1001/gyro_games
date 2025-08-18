@@ -168,24 +168,12 @@ export function init_game() {
     requestAnimationFrame(animate);
 
     // Handle car-like movement
-    let isMoving = false;
 
-    if (keys.up) {
-      // Move forward in the direction the car is facing
-      car.position.x += Math.sin(cubeRotation) * moveSpeed;
-      car.position.z += Math.cos(cubeRotation) * moveSpeed;
-      isMoving = true;
-    }
-    if (keys.down) {
-      // Move backward
-      car.position.x -= Math.sin(cubeRotation) * moveSpeed;
-      car.position.z -= Math.cos(cubeRotation) * moveSpeed;
-      isMoving = true;
-    }
+    // Move forward in the direction the car is facing
+    car.position.x += Math.sin(cubeRotation) * moveSpeed * get_acceleration(local_orientation_data.gamma);
+    car.position.z += Math.cos(cubeRotation) * moveSpeed * get_acceleration(local_orientation_data.gamma);
 
-    // Only allow steering when moving
-    cubeRotation += rotationSpeed * get_steer_direction(local_orientation_data.alpha, local_orientation_data.neutral);
-
+    cubeRotation -= rotationSpeed * get_steer_direction(local_orientation_data.alpha, local_orientation_data.neutral);
 
     // Apply rotation to car
     car.rotation.y = cubeRotation;
