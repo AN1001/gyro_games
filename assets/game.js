@@ -57,7 +57,7 @@ export function init_game() {
   curve.tension = 0.5; // Controls how tight/loose the curves are (0-1)
 
   // Sample points along the curve
-  const trackWidth = 1
+  const trackWidth = 5
   const trackMaterial = new THREE.MeshLambertMaterial({ color: 0x333333 });
 
   // Create track cross-section shape
