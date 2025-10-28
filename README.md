@@ -1,4 +1,4 @@
-Ask me how to play/connect
+Ask me how to play/connect (Must be on same WiFi network to work)
 
 [1] in summary load website on PC and mobile
 
